@@ -847,7 +847,7 @@ class EventRunner:
                     for i in range(3):
                         red_alliance.append(self.results_list_elims[2][i+1])
                         match_8_red.append(self.results_list_elims[2][i+4])
-                if self.results_list_elims[3][9].__eq__('BLUE'):
+                if self.results_list_elims[3][9].__eq__('RED'):
                     for i in range(3):
                         blue_alliance.append(self.results_list_elims[3][i+4])
                         match_8_blue.append(self.results_list_elims[3][i+1])
