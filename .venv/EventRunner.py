@@ -34,7 +34,7 @@ class EventRunner:
         self.alliances = numpy.array([[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]])
         self.results_list_elims = []
         self.week = 0
-        self.fileName = self.event_code + '.csv'
+        self.fileName = 'schedules/' + self.event_code + '.csv'
         self.get_necessary_vars(external_leaderboard_list,external_event_list,external_team_list)
         self.generate_schedule_list(self.fileName,self.schedule_list)
         self.region, self.leaderboard = self.find_event_region(self.event_code,self.leaderboard_list)
