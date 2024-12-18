@@ -249,14 +249,14 @@ with open('eventlists_transposed.csv') as eventFile:
 eventFile.close()
 #print(event_row_list[0])
 if (preloaded == 0):
-    with open('2024_epa_breakdown.csv') as epaFile:
+    with open('2024_epa_breakdown.csv',encoding='utf8') as epaFile:
         reader2 = csv.reader(epaFile)
         for row in reader2:
             epa_row_list.append(row)
     epaFile.close()
     epa_row_list = epa_row_list[1:] # Dump first row
     #print(epa_row_list[0])
-    with open('teams.csv') as teamFile:
+    with open('teams.csv',encoding='utf8') as teamFile:
         reader3 = csv.reader(teamFile)
         for row in reader3:
             team_row_list.append(row[:10]) #cut out extraneous registration debug values

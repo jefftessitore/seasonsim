@@ -685,9 +685,9 @@ class EventRunner:
     """
     def create_elims_bracket(self):
         match1 = [int(1),[self.alliances[0][0],self.alliances[0][1],self.alliances[0][2]],[self.alliances[7][0],self.alliances[7][1],self.alliances[7][2]]]
-        match2 = [int(2),[self.alliances[1][0],self.alliances[1][1],self.alliances[1][2]],[self.alliances[6][0],self.alliances[6][1],self.alliances[6][2]]]
-        match3 = [int(3),[self.alliances[2][0],self.alliances[2][1],self.alliances[2][2]],[self.alliances[5][0],self.alliances[5][1],self.alliances[5][2]]]
-        match4 = [int(4),[self.alliances[3][0],self.alliances[3][1],self.alliances[3][2]],[self.alliances[4][0],self.alliances[4][1],self.alliances[4][2]]]
+        match3 = [int(2),[self.alliances[1][0],self.alliances[1][1],self.alliances[1][2]],[self.alliances[6][0],self.alliances[6][1],self.alliances[6][2]]]
+        match4 = [int(3),[self.alliances[2][0],self.alliances[2][1],self.alliances[2][2]],[self.alliances[5][0],self.alliances[5][1],self.alliances[5][2]]]
+        match2 = [int(4),[self.alliances[3][0],self.alliances[3][1],self.alliances[3][2]],[self.alliances[4][0],self.alliances[4][1],self.alliances[4][2]]]
         self.UBR1 = [match1,match2,match3,match4]
 
     """
@@ -716,7 +716,7 @@ class EventRunner:
             ap = 0
             ref_teamNum = 0
             for i in range(len(self.alliances)):
-                print('Finding reference for team {:5d}'.format(int(team.iTeamNum)))
+                #print('Finding reference for team {:5d}'.format(int(team.iTeamNum)))
                 alliance = self.alliances[i]
                 pos = 0
                 for teamNum in alliance:
@@ -727,7 +727,7 @@ class EventRunner:
                         else: # pos == 3 since only 3 teams per alliance in default case
                             ap = 1 + i # first second pick (i = 0, pos = 3) gets 1, 8th sp (i = 7, pos = 3) gets 1+7=8
                         ref_teamNum = int(alliance[0]) # get captain as index for elims points calculation
-                        print('Reference is: {:5d}'.format(ref_teamNum))
+                        #print('Reference is: {:5d}'.format(ref_teamNum))
                     else: # is not our team
                         continue
                 # team not found, ap = 0 (end of inner for loop)
@@ -743,7 +743,7 @@ class EventRunner:
             four_ref = int(self.results_list_elims[11][4]) if four_res.__eq__('RED') else int(self.results_list_elims[11][1])
             #print('Winner ref: {:5d}\n2nd ref: {:5d}\n3rd ref: {:5d}\n4th ref: {:5d}'.format(win_ref,fin_ref,third_ref,four_ref))
             if int(ref_teamNum) == int(win_ref): 
-                print('{:5d} equals {:5d}'.format(ref_teamNum,win_ref))
+                #print('{:5d} equals {:5d}'.format(ref_teamNum,win_ref))
                 team.blueBanners += 1
                 ep = 30
             elif int(ref_teamNum) == int(fin_ref):
