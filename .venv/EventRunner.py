@@ -652,6 +652,9 @@ class EventRunner:
             elif cChoice == 'p':
                 selection = input('Enter team number: ')
                 teamSelected = int(''.join(digit for digit in selection if digit.isalnum()))
+                if teamSelected in self.alliances:
+                    print('Invalid: Team already picked!')
+                    continue
                 if picks < 16:
                     response = input('Enter a for accept or d for decline --> ')[0]
                     if response == 'd':
@@ -668,8 +671,11 @@ class EventRunner:
                     picks += 1
                 continue
             elif cChoice == 'f':
-                entered = input('Enter next highest rank unpicked: ')
-                teamNum = int(''.join(digit for digit in entered if digit.isalnum()))
+                for rank in self.rankings:
+                    # this if block below is horrific coding practice and I'm not sorry
+                    if (rank.teamNum in self.alliances) == False:
+                        teamNum = rank.teamNum
+                        break
                 self.alliances[int(((picks+1)/2)%8)][0] = teamNum
                 picks += 1
                 continue
@@ -685,9 +691,9 @@ class EventRunner:
     """
     def create_elims_bracket(self):
         match1 = [int(1),[self.alliances[0][0],self.alliances[0][1],self.alliances[0][2]],[self.alliances[7][0],self.alliances[7][1],self.alliances[7][2]]]
-        match3 = [int(2),[self.alliances[1][0],self.alliances[1][1],self.alliances[1][2]],[self.alliances[6][0],self.alliances[6][1],self.alliances[6][2]]]
-        match4 = [int(3),[self.alliances[2][0],self.alliances[2][1],self.alliances[2][2]],[self.alliances[5][0],self.alliances[5][1],self.alliances[5][2]]]
-        match2 = [int(4),[self.alliances[3][0],self.alliances[3][1],self.alliances[3][2]],[self.alliances[4][0],self.alliances[4][1],self.alliances[4][2]]]
+        match3 = [int(3),[self.alliances[1][0],self.alliances[1][1],self.alliances[1][2]],[self.alliances[6][0],self.alliances[6][1],self.alliances[6][2]]]
+        match4 = [int(4),[self.alliances[2][0],self.alliances[2][1],self.alliances[2][2]],[self.alliances[5][0],self.alliances[5][1],self.alliances[5][2]]]
+        match2 = [int(2),[self.alliances[3][0],self.alliances[3][1],self.alliances[3][2]],[self.alliances[4][0],self.alliances[4][1],self.alliances[4][2]]]
         self.UBR1 = [match1,match2,match3,match4]
 
     """
