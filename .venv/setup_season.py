@@ -332,7 +332,7 @@ if (preloaded == 0):
             onstage_points = round(avg_onstage_points*(float(random.randint(5,10))/10.0),1)
             trap_points = round(avg_trap_points*(float(random.randint(5,10))/10.0),1)
             # Technically these run every time I set up the season which is why I'm trying to get this all saved to a file
-        team_events = raw_team[7:] # list of events
+        team_events = raw_team[6:] # list of events
         oTeam = Team(team_num,team_district,float(auto_notes),float(auto_points),float(speaker_notes),float(amp_notes),float(amplified_notes),float(park_points),float(onstage_points),float(trap_points),team_events)
         oTeam.cleanEventList()
         if team_district.__eq__('Regional'):
