@@ -591,7 +591,7 @@ class EventRunner:
                 print('{:5d} | {:7.2f} | {:5.2f} | {:6.2f} | {:6.2f} | {:6.2f} | {:6.2f} | {:6.2f}'.format(int(row[0]),row[1],row[2],row[3],row[4],row[5],row[6],row[7]))
         else:
             for row in opr_table:
-                if not (int(row[1]) in self.alliances):
+                if not (int(row[0]) in self.alliances):
                     print('{:5d} | {:7.2f} | {:5.2f} | {:6.2f} | {:6.2f} | {:6.2f} | {:6.2f} | {:6.2f}'.format(
                         int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
 
