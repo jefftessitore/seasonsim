@@ -6,9 +6,10 @@ Note that it's only built for a game I designed. Modularity/multiple games will 
 Current roadmap (highly subject to change via the whims of my ADHD hyperfocus:)
 * Add support for four-team elimination alliances
 * Change matches to run one at a time, returning to a more limited menu while an event stage is in progress
-* Add ability to save/load ongoing event 
+* Add ability to save/load ongoing event **this one is probably coming the soonest
 * Add support for calling in backup robots during elims (likely using same backend as four-team alliances)
 * Fix OPR calculations
+* Add offseason functionality
 * Add support for changing the game to prebuilt FRC games
 * Decide which FRC games to use and seek out necessary permissions to use them should this actually be more than a personal for-fun project one day
 * Create season-by-season tracking via savefile
@@ -17,7 +18,8 @@ Current roadmap (highly subject to change via the whims of my ADHD hyperfocus:)
 * Add support for creating one's own FRC game
 * GUI support (instead of DOS-like)
 * Randomly-generated event registration schedules per season
-* Game elements: Focus on a team and adjust aspects of team (budget/fundraising, strategy, recruitment, awards?, etc.?) 
+* Game elements: Focus on a team and adjust aspects of team (budget/fundraising, strategy, recruitment, awards?, etc.?)
+* Add offseason team elements
 * (after Game elements) allow for peeking at results of other events the team is not in attendance at
 * Allow player to register for events
 
