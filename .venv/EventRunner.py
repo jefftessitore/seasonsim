@@ -84,8 +84,10 @@ class EventRunner:
     :returns: team object matching team number
     """
     def find_team_object(self,teamNum):
+        #print('Searching team ', str(teamNum).strip())
         for team in self.team_list:
-            if int(team.iTeamNum) == int(teamNum):
+            if int(team.iTeamNum) == int(str(teamNum).strip()):
+                #print('Found team ', str(teamNum).strip())
                 return team
 
     """
@@ -357,7 +359,7 @@ class EventRunner:
     """
     def find_rank_entry(self,teamNum):
         for rank in self.rankings:
-            if int(rank.teamNum) == int(teamNum):
+            if int(str(rank.teamNum).strip()) == int(str(teamNum).strip()):
                 return rank
 
     """
@@ -376,7 +378,10 @@ class EventRunner:
     """
     def get_event_week(self,event_code):
         for event in self.event_list:
-            if event_code.__eq__(event.sCode):
+            #print(str(event_code.sCode).strip())
+            #print(event.sCode.strip())
+            if str(event_code.sCode).strip().__eq__(event.sCode.strip()):
+                #('My event code is ',str(event_code).strip(),' and I matched ',event.sCode.strip())
                 self.eventObject = copy.deepcopy(event)
                 return event.iWeek
         return 0
