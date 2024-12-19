@@ -48,6 +48,7 @@ class EventRunner:
         self.points_from_event = []
         self.event_complete = 0
         self.selection_running = 0
+        self.declined_teams = []
         #print(self.MECAC)
 
     """
@@ -663,14 +664,18 @@ class EventRunner:
                 self.show_oprs(opr_table)
                 continue
             elif cChoice == 'p':
-                selection = input('Enter team number: ')
+                selection = input('Enter team number: ').strip()
                 teamSelected = int(''.join(digit for digit in selection if digit.isalnum()))
                 if teamSelected in self.alliances:
                     print('Invalid: Team already picked!')
                     continue
+                if teamSelected in self.declined_teams:
+                    print('Invalid: That team declined an invitation and is ineligible to be picked!')
+                    continue
                 if picks < 16:
                     response = input('Enter a for accept or d for decline --> ')[0]
                     if response == 'd':
+                        self.declined_teams.append(teamSelected)
                         continue
                     elif response == 'a':
                         self.alliances[int((picks/2)%8)][1] = teamSelected
