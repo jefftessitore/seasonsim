@@ -215,7 +215,7 @@ def save_everything():
             for entry in leaderboard.leaderboard:
                 row.append(entry.teamNum)
                 for score in entry.eventScores:
-                    row.append(entry.score)
+                    row.append(score)
                 row.append(99999) # +99999 to pad
                 row.append(entry.dcmp)
                 row.append(entry.dcmpQ)

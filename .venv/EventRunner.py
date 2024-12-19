@@ -973,19 +973,27 @@ class EventRunner:
     :returns: None
     """
     def save_event(self):
-        qFileName = str(self.event_code) + 'Quals.csv'
-        aFileName = str(self.event_code) + 'Alliances.csv'
-        eFileName = str(self.event_code) + 'Elims.csv'
+        qFileName = 'Official_Results/' + str(self.event_code) + 'Quals.csv'
+        aFileName = 'Official_Results/' + str(self.event_code) + 'Alliances.csv'
+        eFileName = 'Official_Results/' + str(self.event_code) + 'Elims.csv'
         with open(qFileName,'w',newline='') as qfile:
             writer = csv.writer(qfile)
+            row1 = ['#','Red_1','Red_2','Red_3','Blue1','Blue2','Blue3','Red_Score','BlueScore','Result',
+                    'RedNav','RedRaise','RedDeck','RedHull','RedNest','RedHoist',
+                    'BlueNav','BlueRaise','BlueDeck','BlueHull','BlueNest','BlueHoist']
+            writer.writerow(row1)
             writer.writerows(self.results_list_quals)
         qfile.close()
         with open(aFileName,'w',newline='') as afile:
             writer = csv.writer(afile)
+            row1 = ['#','Captn','Pick1','Pick2']
+            writer.writerow(row1)
             writer.writerows(self.alliances)
         afile.close()
         with open(eFileName,'w',newline='') as efile:
             writer = csv.writer(efile)
+            row1 = ['#', 'Red_1', 'Red_2', 'Red_3', 'Blue1', 'Blue2', 'Blue3', 'Red_Score', 'BlueScore', 'Result']
+            writer.writerow(row1)
             writer.writerows(self.results_list_elims)
         efile.close()
     # end of program
