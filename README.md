@@ -6,6 +6,7 @@ Note that it's only built for a game I designed. Modularity/multiple games will 
 Current roadmap (highly subject to change via the whims of my ADHD hyperfocus:)
 * Add support for four-team elimination alliances
 * Change matches to run one at a time, returning to a more limited menu while an event stage is in progress
+* Add ability to save/load ongoing event 
 * Add support for calling in backup robots during elims (likely using same backend as four-team alliances)
 * Fix OPR calculations
 * Add support for changing the game to prebuilt FRC games
