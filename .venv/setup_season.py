@@ -378,7 +378,7 @@ if (preloaded == 0):
         leaderboard.build_leaderboard_list() # internal
 # end if preload == 0
 else:
-    print('Preloading from save...')
+    #print('Preloading from save...')
     teamSaveRows = []
     with open('allteams.csv') as teamSaveFile:
         saveReader1 = csv.reader(teamSaveFile)
@@ -426,7 +426,7 @@ else:
         # end of row
         team_list.append(loadedTeam)
     # end of for loop
-    print('Loaded {:4d} teams'.format(len(team_list)))
+    #print('Loaded {:4d} teams'.format(len(team_list)))
     # do leaderboards next / events?
     lbSaveRows = []
     with open('allleaderboards.csv') as lbSaveFile:

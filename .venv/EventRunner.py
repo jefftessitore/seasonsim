@@ -164,10 +164,10 @@ class EventRunner:
         # Red
         for team in red_alliance:
             #print('Finding team ',int(team.strip()))
-            if team is int:
-                teamO = self.fast_fto(team)
-            else:
-                teamO = self.fast_fto(int(team.strip()))
+            #if team is np.dtype('int64'):
+            teamO = self.fast_fto(team)
+            #else:
+                #teamO = self.fast_fto(int(team.strip()))
             #print('Found team ',teamO.iTeamNum)
             team_devs = (self.MECAC - teamO.fCAC)/self.std
             if team_devs >= 3.0:
