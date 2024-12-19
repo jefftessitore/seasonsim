@@ -47,6 +47,7 @@ class EventRunner:
         self.qualsRan = 0
         self.points_from_event = []
         self.event_complete = 0
+        self.selection_running = 0
         #print(self.MECAC)
 
     """
@@ -585,8 +586,14 @@ class EventRunner:
     """
     def show_oprs(self,opr_table):
         print('Team# | ScorePM | NavPM | AnchPM | DeckPM | HullPM | NestPM | SailPM')
-        for row in opr_table:
-            print('{:5d} | {:7.2f} | {:5.2f} | {:6.2f} | {:6.2f} | {:6.2f} | {:6.2f} | {:6.2f}'.format(int(row[0]),row[1],row[2],row[3],row[4],row[5],row[6],row[7]))
+        if self.selection_running == 0:
+            for row in opr_table:
+                print('{:5d} | {:7.2f} | {:5.2f} | {:6.2f} | {:6.2f} | {:6.2f} | {:6.2f} | {:6.2f}'.format(int(row[0]),row[1],row[2],row[3],row[4],row[5],row[6],row[7]))
+        else:
+            for row in opr_table:
+                if int(row[1]) not in self.alliances:
+                    print('{:5d} | {:7.2f} | {:5.2f} | {:6.2f} | {:6.2f} | {:6.2f} | {:6.2f} | {:6.2f}'.format(
+                        int(row[0]), row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
 
     """
     :param self
@@ -630,6 +637,7 @@ class EventRunner:
     :returns: None
     """
     def run_alliance_selection(self):
+        self.selection_running = 1
         if self.qualsRan == 0:
             print('Quals not complete!')
             return None
@@ -683,6 +691,7 @@ class EventRunner:
                 print('Please enter a valid choice')
                 continue
         self.create_elims_bracket()
+        self.selection_running = 0
         # End of method
 
     """
