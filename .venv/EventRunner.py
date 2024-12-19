@@ -24,7 +24,7 @@ import os
 # Declare these up here so get_necessary_vars knows they exist WITHOUT this program running
 class EventRunner:
     def __init__(self,eventCode,external_leaderboard_list,external_event_list,external_team_list):
-        self.event_code = eventCode
+        self.event_code = str(eventCode).strip()
         self.leaderboard_list = []
         self.event_list = []
         self.team_list = [] # ALL teams
@@ -98,7 +98,8 @@ class EventRunner:
     """
     def fast_fto(self,teamNum):
         for team in self.teams_at_event:
-            if int(team.iTeamNum) == int(teamNum):
+            #print(str(team.iTeamNum).strip())
+            if str(team.iTeamNum).strip().__eq__(str(teamNum).strip()):
                 return team
 
     """
@@ -162,7 +163,12 @@ class EventRunner:
         blue_endgameNav   = 0
         # Red
         for team in red_alliance:
-            teamO = self.fast_fto(team)
+            #print('Finding team ',int(team.strip()))
+            if team is int:
+                teamO = self.fast_fto(team)
+            else:
+                teamO = self.fast_fto(int(team.strip()))
+            #print('Found team ',teamO.iTeamNum)
             team_devs = (self.MECAC - teamO.fCAC)/self.std
             if team_devs >= 3.0:
                 percent_adjust = 0.10
@@ -379,10 +385,10 @@ class EventRunner:
     """
     def get_event_week(self,event_code):
         for event in self.event_list:
-            #print(str(event_code.sCode).strip())
+            #print(str(event_code).strip())
             #print(event.sCode.strip())
             if str(event_code.sCode).strip().__eq__(event.sCode.strip()):
-                #('My event code is ',str(event_code).strip(),' and I matched ',event.sCode.strip())
+                #print('My event code is ',str(event_code).strip(),' and I matched ',event.sCode.strip())
                 self.eventObject = copy.deepcopy(event)
                 return event.iWeek
         return 0
@@ -394,11 +400,12 @@ class EventRunner:
     :returns: leaderboard.sIdentifier/ERR matching leaderboard (or error case), refernce to the leaderboard object/None
     """
     def find_event_region(self,eventCode,leaderboard_list):
+        #print(eventCode)
         for leaderboard in leaderboard_list:
             #print(leaderboard.sIdentifier)
             for event in leaderboard.events:
-                #print(event)
-                if eventCode.__eq__(event):
+                #print(event.sCode)
+                if eventCode.__eq__(event.sCode):
                     self.week = self.get_event_week(event)
                     if self.week == 0:
                         return 'ERR', None

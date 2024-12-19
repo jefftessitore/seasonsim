@@ -191,6 +191,7 @@ def save_everything():
             row.append(str(team.numTeleDeckAttempted))
             writer.writerow(row)
     teamSave.close()
+    '''
     with open('allevents.csv','w',newline='') as eventSave:
         writer = csv.writer(eventSave)
         eventrows = []
@@ -199,7 +200,7 @@ def save_everything():
             row = []
             row.append(event.event_code)
             writer.writerow(row)
-    eventSave.close()
+    eventSave.close()'''
     with open('allleaderboards.csv','w',newline='') as lbSave:
         writer = csv.writer(lbSave)
         leaderboardrows = []
@@ -230,12 +231,21 @@ def save_everything():
         writer = csv.writer(statusFile)
         writer.writerows(status)
 
+def str_to_bool(s):
+    if s == 'True':
+         return True
+    elif s == 'False':
+         return False
+    else:
+         raise ValueError
+
 # Main Program
 preloaded = 0
 with open('donotchange.csv') as statusFile:
     reader = csv.reader(statusFile)
     for row in reader:
-        if row[0] == 1:
+        print(row)
+        if row[0] == '1':
             preloaded = 1
 
 event_row_list = []
@@ -368,6 +378,7 @@ if (preloaded == 0):
         leaderboard.build_leaderboard_list() # internal
 # end if preload == 0
 else:
+    print('Preloading from save...')
     teamSaveRows = []
     with open('allteams.csv') as teamSaveFile:
         saveReader1 = csv.reader(teamSaveFile)
@@ -391,16 +402,16 @@ else:
             if len(str(team_data[i+10]))>0:
                 tEL.append(str(team_data[i+10]))
         # constructor done, create team now
-        loadedTeam = Team(num,dist,f2024AN,f2024SN,f2024AM,f2024NA,f2024PP,f2024OP,f2024TP,tEL)
+        loadedTeam = Team(num,dist,f2024AN,f2024AP,f2024SN,f2024AM,f2024NA,f2024PP,f2024OP,f2024TP,tEL)
         # constructor defaults values, we override
-        loadedTeam.bDistrict = int(team_data[16])
+        loadedTeam.bDistrict = str_to_bool(team_data[16])
         loadedTeam.iNumPrevEvents = int(team_data[17])
         loadedTeam.iDeltaLastEvent = int(team_data[18])
         loadedTeam.fBreakdownChance = float(team_data[19])
         loadedTeam.fCAC = float(team_data[20])
         loadedTeam.iDistrictCode = int(team_data[21])
         loadedTeam.percentRaise = float(team_data[22])
-        loadedTeam.numRaise = int(team_data[23])
+        loadedTeam.numRaise = float(team_data[23])
         loadedTeam.percentNav = float(team_data[24])
         loadedTeam.percentHoist = float(team_data[25])
         loadedTeam.blueBanners = int(team_data[26])

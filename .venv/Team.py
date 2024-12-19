@@ -22,7 +22,7 @@ class Team:
         self.iDistrictCode = -1
         self.tagDistrict()
         self.percentRaise = 0.0
-        self.numRaise = 0
+        self.numRaise = 0.0
         self.percentNav = 0.0
         self.percentHoist = 0.0
         self.blueBanners = 0
