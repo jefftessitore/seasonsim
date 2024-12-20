@@ -49,6 +49,7 @@ class EventRunner:
         self.event_complete = 0
         self.selection_running = 0
         self.declined_teams = []
+        self.declined_picks = []
         #print(self.MECAC)
 
     """
@@ -693,6 +694,7 @@ class EventRunner:
                         response = response[0]
                     if response == 'd':
                         self.declined_teams.append(teamSelected)
+                        self.declined_picks.append(int((picks/2)+1))
                         continue
                     elif response == 'a':
                         self.alliances[int((picks/2)%8)][1] = teamSelected
@@ -1021,6 +1023,7 @@ class EventRunner:
         aFileName = 'Official_Results/' + str(self.event_code) + 'Alliances.csv'
         eFileName = 'Official_Results/' + str(self.event_code) + 'Elims.csv'
         rFileName = 'Official_Results/' + str(self.event_code) + 'Ranks.csv'
+        dFileName = 'Official_Results/' + str(self.event_code) + 'Declines.csv'
         with open(qFileName,'w',newline='') as qfile:
             writer = csv.writer(qfile)
             row1 = ['#','Red_1','Red_2','Red_3','Blue1','Blue2','Blue3','Red_Score','BlueScore','Result',
@@ -1052,4 +1055,18 @@ class EventRunner:
                 rankNum += 1
                 writer.writerow(row)
         rfile.close()
+
+        with open(dFileName,'w',newline='') as dfile:
+            writer = csv.writer(dfile)
+            if len(self.declined_teams) > 0:
+                row1 = ['Decliner','Captain Num Declined']
+                writer.writerow(row1)
+                for decliner,declinee in zip(self.declined_teams,self.declined_picks):
+                    row = [decliner,declinee]
+                    writer.writerow(row)
+            else:
+                row1 = ['No','Declines']
+                writer.writerow(row1)
+        dfile.close()
+
     # end of program
