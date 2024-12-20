@@ -680,6 +680,9 @@ class EventRunner:
                 if selection is None: # if we received nothing
                     continue
                 teamSelected = int(''.join(digit for digit in selection if digit.isalnum()))
+                if self.fast_fto(teamSelected) is None: # in theory should return None only if fast_fto didn't find the teamNum
+                    print('Invalid: Team not present at event!')
+                    continue
                 if teamSelected in self.alliances:
                     print('Invalid: Team already picked!')
                     continue
