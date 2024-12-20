@@ -1,7 +1,8 @@
 Very early pre-alpha version of a Sports Management-style videogame based on FRC that myself and Evan Watson (Oregon State University) are slowly desigining
 
-The codebase itself hasn't been tested for actually loading from the savefile (though the save file appears to work saving everything), but on an event-by-event basis it works
-Note that it's only built for a game I designed. Modularity/multiple games will come much later.
+The codebase itself is only built for a game I designed. Modularity/multiple games will come much later.
+
+The math calculations behind match simulation are getting an overhaul at some point
 
 Current roadmap (highly subject to change via the whims of my ADHD hyperfocus:)
 * Add support for four-team elimination alliances
@@ -18,6 +19,7 @@ Current roadmap (highly subject to change via the whims of my ADHD hyperfocus:)
 * Add support for creating one's own FRC game
 * GUI support (instead of DOS-like)
 * Randomly-generated event registration schedules per season
+* Automated alliance selection
 * Game elements: Focus on a team and adjust aspects of team (budget/fundraising, strategy, recruitment, awards?, etc.?)
 * Add offseason team elements
 * (after Game elements) allow for peeking at results of other events the team is not in attendance at
