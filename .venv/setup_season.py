@@ -512,7 +512,11 @@ cChoice = ''
 finished_events = []
 while True: 
     menu()
-    cChoice = input('Enter choice --> ')[0]
+    cChoice = input('Enter choice --> ').strip()
+    if cChoice is None:
+        continue
+    else:
+        cChoice = cChoice[0]
     if cChoice == 'l': # load an event
         eventChoice = input('Enter Event Code: ')
         eventRunning = EventRunner(eventChoice,leaderboard_list,event_list,team_list)

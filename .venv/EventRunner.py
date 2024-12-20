@@ -663,7 +663,11 @@ class EventRunner:
                 self.print_ranks()
             self.show_alliances()
             self.alliance_menu()
-            cChoice = input('Enter Choice --> ')[0]
+            cChoice = input('Enter Choice --> ').strip()
+            if cChoice is None:
+                continue
+            else:
+                cChoice = cChoice[0]
             if cChoice == 'a':
                 self.print_ranks()
                 continue
@@ -672,6 +676,8 @@ class EventRunner:
                 continue
             elif cChoice == 'p':
                 selection = input('Enter team number: ').strip()
+                if selection is None: # if we received nothing
+                    continue
                 teamSelected = int(''.join(digit for digit in selection if digit.isalnum()))
                 if teamSelected in self.alliances:
                     print('Invalid: Team already picked!')
@@ -680,7 +686,11 @@ class EventRunner:
                     print('Invalid: That team declined an invitation and is ineligible to be picked!')
                     continue
                 if picks < 16:
-                    response = input('Enter a for accept or d for decline --> ')[0]
+                    response = input('Enter a for accept or d for decline --> ').strip()
+                    if response is None:
+                        continue
+                    else:
+                        response = response[0]
                     if response == 'd':
                         self.declined_teams.append(teamSelected)
                         continue
@@ -1017,7 +1027,7 @@ class EventRunner:
         with open(rFileName,'w',newline='') as rfile:
             writer = csv.writer(rfile)
             rankNum = 1
-            row1 = ['Rank','Team#','Record','#P','RP','Rank Score','Total Score','Nav','Anch','Deck','Hull','Nest','Sail']
+            row1 = ['Rank','Team#','W','L','T','#P','RP','Rank Score','Total Score','Nav','Anch','Deck','Hull','Nest','Sail']
             writer.writerow(row1)
             for rank in self.rankings:
                 row = [rankNum, rank.teamNum, rank.wins, rank.losses, rank.ties, rank.totalMatches, rank.RP, rank.RS,
