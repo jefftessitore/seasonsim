@@ -873,22 +873,22 @@ class EventRunner:
             if matchNum == 5:
                 red_alliance = []
                 blue_alliance = []
-                if self.results_list_elims[0][9].__eq__('RED'): # don't need to get_index because index 0 is always successful match 1
+                if self.results_list_elims[self.get_index(1)][9].__eq__('RED'): # don't need to get_index because index 0 is always successful match 1
                     for i in range(3):
-                        red_alliance.append(self.results_list_elims[0][i+4])
-                        match_7_red.append(self.results_list_elims[0][i+1])
+                        red_alliance.append(self.results_list_elims[self.get_index(1)][i+4])
+                        match_7_red.append(self.results_list_elims[self.get_index(1)][i+1])
                 else: # BLUE
                     for i in range(3):
-                        red_alliance.append(self.results_list_elims[0][i+1])
-                        match_7_red.append(self.results_list_elims[0][i+1])
+                        red_alliance.append(self.results_list_elims[self.get_index(1)][i+1])
+                        match_7_red.append(self.results_list_elims[self.get_index(1)][i+4])
                 if self.results_list_elims[self.get_index(2)][9].__eq__('RED'):
                     for i in range(3):
-                        blue_alliance.append(self.results_list_elims[1][i+4])
-                        match_7_blue.append(self.results_list_elims[1][i+1])
+                        blue_alliance.append(self.results_list_elims[self.get_index(2)][i+4])
+                        match_7_blue.append(self.results_list_elims[self.get_index(2)][i+1])
                 else: # BLUE
                     for i in range(3):
-                        blue_alliance.append(self.results_list_elims[1][i+1])
-                        match_7_blue.append(self.results_list_elims[1][i+4])
+                        blue_alliance.append(self.results_list_elims[self.get_index(2)][i+1])
+                        match_7_blue.append(self.results_list_elims[self.get_index(2)][i+4])
                 match5 = [int(5),red_alliance,blue_alliance]
                 self.run_match(match5,1,self.results_list_elims)
             elif matchNum == 6:
@@ -896,20 +896,20 @@ class EventRunner:
                 blue_alliance = []
                 if self.results_list_elims[self.get_index(3)][9].__eq__('RED'):
                     for i in range(3):
-                        red_alliance.append(self.results_list_elims[2][i+4])
-                        match_8_red.append(self.results_list_elims[2][i+1])
+                        red_alliance.append(self.results_list_elims[self.get_index(3)][i+4])
+                        match_8_red.append(self.results_list_elims[self.get_index(3)][i+1])
                 else: # BLUE
                     for i in range(3):
-                        red_alliance.append(self.results_list_elims[2][i+1])
-                        match_8_red.append(self.results_list_elims[2][i+4])
+                        red_alliance.append(self.results_list_elims[self.get_index(3)][i+1])
+                        match_8_red.append(self.results_list_elims[self.get_index(3)][i+4])
                 if self.results_list_elims[self.get_index(4)][9].__eq__('RED'):
                     for i in range(3):
-                        blue_alliance.append(self.results_list_elims[3][i+4])
-                        match_8_blue.append(self.results_list_elims[3][i+1])
+                        blue_alliance.append(self.results_list_elims[self.get_index(4)][i+4])
+                        match_8_blue.append(self.results_list_elims[self.get_index(4)][i+1])
                 else: # BLUE
                     for i in range(3):
-                        blue_alliance.append(self.results_list_elims[3][i+1])
-                        match_8_blue.append(self.results_list_elims[3][i+4])
+                        blue_alliance.append(self.results_list_elims[self.get_index(4)][i+1])
+                        match_8_blue.append(self.results_list_elims[self.get_index(4)][i+4])
                 match6 = [int(6),red_alliance,blue_alliance]
                 self.run_match(match6,1,self.results_list_elims)
             elif matchNum == 7:
@@ -921,35 +921,35 @@ class EventRunner:
             elif matchNum == 9:
                 if self.results_list_elims[self.get_index(7)][9].__eq__('RED'): # Need loser of match 7
                     for i in range(3):
-                        match_9_red.append(self.results_list_elims[6][i+4])
-                        match_11_red.append(self.results_list_elims[6][i+1]) # Winner goes to match 11 red
+                        match_9_red.append(self.results_list_elims[self.get_index(7)][i+4])
+                        match_11_red.append(self.results_list_elims[self.get_index(7)][i+1]) # Winner goes to match 11 red
                 else: # BLUE
                     for i in range(3):
-                        match_9_red.append(self.results_list_elims[6][i+1])
-                        match_11_red.append(self.results_list_elims[6][i+4])
+                        match_9_red.append(self.results_list_elims[self.get_index(7)][i+1])
+                        match_11_red.append(self.results_list_elims[self.get_index(7)][i+4])
                 if self.results_list_elims[self.get_index(6)][9].__eq__('RED'): # Need winner of match 6 (loser eliminated)
                     for i in range(3):
-                        match_9_blue.append(self.results_list_elims[5][i+1])
+                        match_9_blue.append(self.results_list_elims[self.get_index(6)][i+1])
                 else: # BLUE
                     for i in range(3):
-                        match_9_blue.append(self.results_list_elims[5][i+4])
+                        match_9_blue.append(self.results_list_elims[self.get_index(6)][i+4])
                 match9 = [int(9),match_9_red,match_9_blue]
                 self.run_match(match9,1,self.results_list_elims)
             elif matchNum == 10:
                 if self.results_list_elims[self.get_index(8)][9].__eq__('RED'): # Need Loser of match 8
                     for i in range(3):
-                        match_10_red.append(self.results_list_elims[7][i+4])
-                        match_11_blue.append(self.results_list_elims[7][i+1])  # Winner goes to match 11 blue
+                        match_10_red.append(self.results_list_elims[self.get_index(8)][i+4])
+                        match_11_blue.append(self.results_list_elims[self.get_index(8)][i+1])  # Winner goes to match 11 blue
                 else: # BLUE
                     for i in range(3):
-                        match_10_red.append(self.results_list_elims[7][i+1])
-                        match_11_blue.append(self.results_list_elims[7][i+4])
+                        match_10_red.append(self.results_list_elims[self.get_index(8)][i+1])
+                        match_11_blue.append(self.results_list_elims[self.get_index(8)][i+4])
                 if self.results_list_elims[self.get_index(5)][9].__eq__('RED'): # Need winner of match 5 (Loser eliminated)
                     for i in range(3):
-                        match_10_blue.append(self.results_list_elims[4][i+1])
+                        match_10_blue.append(self.results_list_elims[self.get_index(5)][i+1])
                 else: # BLUE
                     for i in range(3):
-                        match_10_blue.append(self.results_list_elims[4][i+4])
+                        match_10_blue.append(self.results_list_elims[self.get_index(5)][i+4])
                 match10 = [int(10),match_10_red,match_10_blue]
                 self.run_match(match10,1,self.results_list_elims)
             elif matchNum == 11:
@@ -958,42 +958,42 @@ class EventRunner:
             elif matchNum == 12: 
                 if self.results_list_elims[self.get_index(10)][9].__eq__('RED'): # Need winner of match 10 (Loser eliminated)
                     for i in range(3):
-                        match_12_red.append(self.results_list_elims[9][i+1])
+                        match_12_red.append(self.results_list_elims[self.get_index(10)][i+1])
                 else: # BLUE
                     for i in range(3):
-                        match_12_red.append(self.results_list_elims[9][i+4])
+                        match_12_red.append(self.results_list_elims[self.get_index(10)][i+4])
                 if self.results_list_elims[self.get_index(9)][9].__eq__('RED'): # Need winner of match 9 (Loser eliminated)
                     for i in range(3):
-                        match_12_blue.append(self.results_list_elims[8][i+1])
+                        match_12_blue.append(self.results_list_elims[self.get_index(9)][i+1])
                 else: # BLUE
                     for i in range(3):
-                        match_12_blue.append(self.results_list_elims[8][i+4])
+                        match_12_blue.append(self.results_list_elims[self.get_index(9)][i+4])
                 match12 = [int(12),match_12_red,match_12_blue]
                 self.run_match(match12,1,self.results_list_elims)
             elif matchNum == 13: # Third place match
                 if self.results_list_elims[self.get_index(11)][9].__eq__('RED'): # Need loser of match 11 (winner to finals)
                     for i in range(3):
-                        match_13_red.append(self.results_list_elims[10][i+4])
-                        finals_red.append(self.results_list_elims[10][i+1])
+                        match_13_red.append(self.results_list_elims[self.get_index(11)][i+4])
+                        finals_red.append(self.results_list_elims[self.get_index(11)][i+1])
                 else: # BLUE
                     for i in range(3):
-                        match_13_red.append(self.results_list_elims[10][i+1])
-                        finals_red.append(self.results_list_elims[10][i+4])
+                        match_13_red.append(self.results_list_elims[self.get_index(11)][i+1])
+                        finals_red.append(self.results_list_elims[self.get_index(11)][i+4])
                 if self.results_list_elims[self.get_index(12)][9].__eq__('RED'): # Need winner of match 12 (Loser eliminated)
                     for i in range(3):
-                        match_13_blue.append(self.results_list_elims[11][i+1])
+                        match_13_blue.append(self.results_list_elims[self.get_index(12)][i+1])
                 else: # BLUE
                     for i in range(3):
-                        match_13_blue.append(self.results_list_elims[11][i+4])
+                        match_13_blue.append(self.results_list_elims[self.get_index(12)][i+4])
                 match13 = [int(13),match_13_red,match_13_blue]
                 self.run_match(match13,1,self.results_list_elims)
             elif matchNum == 14: # Finals 1
                 if self.results_list_elims[self.get_index(13)][9].__eq__('RED'): # Need winner of match 13 (Loser eliminated)
                     for i in range(3):
-                        finals_blue.append(self.results_list_elims[12][i+1])
+                        finals_blue.append(self.results_list_elims[self.get_index(13)][i+1])
                 else: # BLUE
                     for i in range(3):
-                        finals_blue.append(self.results_list_elims[12][i+4])
+                        finals_blue.append(self.results_list_elims[self.get_index(13)][i+4])
                 match14 = [int(14),finals_red,finals_blue]
                 self.run_match(match14,1,self.results_list_elims)
             elif matchNum == 15: # Finals 2
