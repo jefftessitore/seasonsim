@@ -1003,7 +1003,7 @@ class EventRunner:
         qfile.close()
         with open(aFileName,'w',newline='') as afile:
             writer = csv.writer(afile)
-            row1 = ['#','Captn','Pick1','Pick2']
+            row1 = ['Captn','Pick1','Pick2']
             writer.writerow(row1)
             writer.writerows(self.alliances)
         afile.close()
