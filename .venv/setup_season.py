@@ -225,6 +225,7 @@ def save_everything():
                 row.append(-99998) # need to pad each entry
             row.append(-99999) # look for last -99999
             row.append(leaderboard.isRegional)
+        writer.writerows(leaderboardrows) # Welp
                 
     status = [[1]]
     with open('donotchange.csv','w',newline='') as statusFile:
