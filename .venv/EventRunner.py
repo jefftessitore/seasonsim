@@ -706,6 +706,9 @@ class EventRunner:
                     picks += 1
                 continue
             elif cChoice == 'f':
+                if picks > 15: # oops...
+                    print('Invalid: All captain spots filled!')
+                    continue
                 for rank in self.rankings:
                     # this if block below is horrific coding practice and I'm not sorry
                     if (rank.teamNum in self.alliances) == False:
