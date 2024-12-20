@@ -993,6 +993,7 @@ class EventRunner:
         qFileName = 'Official_Results/' + str(self.event_code) + 'Quals.csv'
         aFileName = 'Official_Results/' + str(self.event_code) + 'Alliances.csv'
         eFileName = 'Official_Results/' + str(self.event_code) + 'Elims.csv'
+        rFileName = 'Official_Results/' + str(self.event_code) + 'Ranks.csv'
         with open(qFileName,'w',newline='') as qfile:
             writer = csv.writer(qfile)
             row1 = ['#','Red_1','Red_2','Red_3','Blue1','Blue2','Blue3','Red_Score','BlueScore','Result',
@@ -1013,4 +1014,15 @@ class EventRunner:
             writer.writerow(row1)
             writer.writerows(self.results_list_elims)
         efile.close()
+        with open(rFileName,'w',newline='') as rfile:
+            writer = csv.writer(rfile)
+            rankNum = 1
+            row1 = ['Rank','Team#','Record','#P','RP','Rank Score','Total Score','Nav','Anch','Deck','Hull','Nest','Sail']
+            writer.writerow(row1)
+            for rank in self.rankings:
+                row = [rankNum, rank.teamNum, rank.wins, rank.losses, rank.ties, rank.totalMatches, rank.RP, rank.RS,
+                        rank.totalScore, rank.Nav, rank.Anch, rank.Deck, rank.Hull, rank.Nest, rank.Sail]
+                rankNum += 1
+                writer.writerow(row)
+        rfile.close()
     # end of program
