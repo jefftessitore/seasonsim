@@ -50,6 +50,7 @@ class EventRunner:
         self.selection_running = 0
         self.declined_teams = []
         self.declined_picks = []
+        self.run_rest_quals = 0
         #print(self.MECAC)
 
     """
@@ -336,6 +337,12 @@ class EventRunner:
             # Append result
             results_list.append(result_entry)
             #print(result_entry) # debug
+            if self.run_rest_quals == 0:
+                #print('Match#','Red_1','Red_2','Red_3','Blue1','Blue2','Blue3','Red_Score','BlueScore','Result')
+                print('Match Num: ',result_entry[0],
+                      '\nRed: ',result_entry[1],result_entry[2],result_entry[3],
+                      '\nBlue: ',result_entry[4],result_entry[5],result_entry[6],
+                      '\nScores and Result: ',result_entry[7],result_entry[8],result_entry[9])
         else: # elim
             #print('Made it to else statement')
             result_entry = []
@@ -370,14 +377,51 @@ class EventRunner:
             if int(str(rank.teamNum).strip()) == int(str(teamNum).strip()):
                 return rank
 
+    def quals_menu(self,match_num):
+        print('Next match: Qualification ',int(match_num)) # typecast JUST IN CASE
+        print('n - Run next match')
+        print('r - Show rankings')
+        print('z - Run all remaining matches')
+        #print('s - Save event')
+
     """
     :param self
     :returns: None
     """
     def run_quals(self):
-        for match in self.schedule_list:
-            self.run_match(match,0,self.results_list_quals)
+        match_num = 1
+        cChoice = ''
+        quals_toRun = len(schedule_list)
+        while match_num <= quals_toRun:
+            match = schedule_list[match_num-1] # grab match object
+            if self.run_rest_quals == 0:
+                self.quals_menu(match_num)
+                cChoice = input('Enter choice --> ').strip()
+                if cChoice is None:
+                    continue
+                else:
+                    cChoice = cChoice[0]
+                if cChoice == 'n':
+                    self.run_match(match,0,self.results_list_quals)
+                    match_num += 1
+                    continue
+                elif cChoice == 'r':
+                    self.print_ranks()
+                    continue
+                elif cChoice == 'z':
+                    self.run_rest_quals = 1
+                    self.run_match(match,0,self.results_list_quals)
+                    match_num += 1
+                    continue
+                else:
+                    print('Please enter a valid option.')
+                    continue
+            else:
+                self.run_match(match,0,self.results_list_quals)
+                match_num += 1
+            # end while loop
         self.qualsRan = 1
+        # end def run_quals
 
     """
     :param self
