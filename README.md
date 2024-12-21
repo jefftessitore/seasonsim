@@ -5,11 +5,11 @@ The codebase itself is only built for a game I designed. Modularity/multiple gam
 The math calculations behind match simulation are getting an overhaul at some point
 
 Current roadmap (highly subject to change via the whims of my ADHD hyperfocus:)
-* Add support for four-team elimination alliances
-* Change matches to run one at a time, returning to a more limited menu while an event stage is in progress
-* Add ability to save/load ongoing event **this one is probably coming the soonest
-* Add support for calling in backup robots during elims (likely using same backend as four-team alliances)
-* Fix OPR calculations
+* Add support for four-team elimination alliances (IN PROGRESS)
+* Change matches to run one at a time, returning to a more limited menu while an event stage is in progress (IN PROGRESS)
+* Add ability to save/load ongoing event **this one is probably coming the soonest (IN PROGRESS)
+* Add support for calling in backup robots during elims (likely using same backend as four-team alliances) (ON DECK)
+* Fix OPR calculations (ON DECK)
 * Add offseason functionality
 * Add support for changing the game to prebuilt FRC games
 * Decide which FRC games to use and seek out necessary permissions to use them should this actually be more than a personal for-fun project one day
