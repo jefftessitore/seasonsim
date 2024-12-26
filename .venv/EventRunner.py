@@ -23,7 +23,7 @@ import os
 
 # Declare these up here so get_necessary_vars knows they exist WITHOUT this program running
 class EventRunner:
-    def __init__(self,eventCode,external_leaderboard_list,external_event_list,external_team_list):
+    def __init__(self,eventCode,external_leaderboard_list,external_event_list,external_team_list,loaded_from_save):
         self.event_code = str(eventCode).strip()
         self.leaderboard_list = []
         self.event_list = []
@@ -36,14 +36,14 @@ class EventRunner:
         self.week = 0
         self.fileName = 'schedules/' + self.event_code + '.csv'
         self.get_necessary_vars(external_leaderboard_list,external_event_list,external_team_list)
-        self.generate_schedule_list(self.fileName,self.schedule_list)
+        self.generate_schedule_list(self.fileName)
         self.region, self.leaderboard = self.find_event_region(self.event_code,self.leaderboard_list)
         self.rankings = []
         self.preload_rank_list()
         self.std = 0.0
         self.MECAC = self.calc_MECAC()
         self.a = 2.5
-        self.b = 1.5
+        self.b = 1.495 #week 1: 1.5
         self.qualsRan = 0
         self.points_from_event = []
         self.event_complete = 0
@@ -51,6 +51,12 @@ class EventRunner:
         self.declined_teams = []
         self.declined_picks = []
         self.run_rest_quals = 0
+        self.last_qual_ran = 1
+        self.quals_toRun = len(self.schedule_list)
+        self.loaded = loaded_from_save # 0 or 1
+        if self.loaded:
+            self.load_partial_event()
+            self.qualsRan = len(self.results_list_quals)
         #print(self.MECAC)
 
     """
@@ -71,7 +77,7 @@ class EventRunner:
     :param schedule_list: reference to the specified schedule list to modify
     :returns: None
     """
-    def generate_schedule_list(self,fileName,schedule_list):
+    def generate_schedule_list(self,fileName):
         schedule_row_list = []
         with open(fileName) as schedule:
             reader = csv.reader(schedule)
@@ -79,7 +85,7 @@ class EventRunner:
                 schedule_row_list.append(row)
         schedule.close()
         for match in schedule_row_list:
-            schedule_list.append([match[0],match[1:4],match[-3:]])
+            self.schedule_list.append([match[0],match[1:4],match[-3:]]) # honestly no idea how this was working week 1
 
     """
     :param self
@@ -171,22 +177,23 @@ class EventRunner:
             #else:
                 #teamO = self.fast_fto(int(team.strip()))
             #print('Found team ',teamO.iTeamNum)
-            team_devs = (self.MECAC - teamO.fCAC)/self.std
-            if team_devs >= 3.0:
-                percent_adjust = 0.10
-            elif team_devs >= 2.5:
-                percent_adjust = 0.07
-            elif team_devs >= 2.0:
+            team_devs = abs((self.MECAC - teamO.fCAC)/self.std) # corrected weeks 2+
+            team_sign = (self.MECAC - teamO.fCAC) / self.std
+            if team_devs >= 3.0: # nerfed for weeks 2+
                 percent_adjust = 0.05
+            elif team_devs >= 2.5:
+                percent_adjust = 0.035
+            elif team_devs >= 2.0:
+                percent_adjust = 0.025
             elif team_devs >= 1.5:
-                percent_adjust = 0.03
+                percent_adjust = 0.015
             elif team_devs >= 1.0:
-                percent_adjust = 0.02
-            elif team_devs >= 0.5:
                 percent_adjust = 0.01
+            elif team_devs >= 0.5:
+                percent_adjust = 0.005
             else:
                 percent_adjust = 0.0
-            if team_devs > 0: # if team CAC is below MECAC
+            if team_sign > 0: # if team CAC is below MECAC
                 percent_adjust = -1*percent_adjust # flip sign
             
             red_autoMobile += teamO.autoCross
@@ -216,23 +223,24 @@ class EventRunner:
         # Blue
         for team in blue_alliance:
             teamO = self.fast_fto(team)
-            team_devs = (self.MECAC - teamO.fCAC)/self.std
-            if team_devs >= 3.0:
-                percent_adjust = 0.10
-            elif team_devs >= 2.5:
-                percent_adjust = 0.07
-            elif team_devs >= 2.0:
+            team_devs = abs((self.MECAC - teamO.fCAC) / self.std)  # corrected weeks 2+
+            team_sign = (self.MECAC - teamO.fCAC) / self.std
+            if team_devs >= 3.0:  # nerfed for weeks 2+
                 percent_adjust = 0.05
+            elif team_devs >= 2.5:
+                percent_adjust = 0.035
+            elif team_devs >= 2.0:
+                percent_adjust = 0.025
             elif team_devs >= 1.5:
-                percent_adjust = 0.03
+                percent_adjust = 0.015
             elif team_devs >= 1.0:
-                percent_adjust = 0.02
-            elif team_devs >= 0.5:
                 percent_adjust = 0.01
+            elif team_devs >= 0.5:
+                percent_adjust = 0.005
             else:
                 percent_adjust = 0.0
-            if team_devs > 0: # if team CAC is below MECAC
-                percent_adjust = -1*percent_adjust # flip sign
+            if team_sign > 0:  # if team CAC is below MECAC
+                percent_adjust = -1 * percent_adjust  # flip sign
                 
             blue_autoMobile += teamO.autoCross
             blue_autoDeck += round(beta.rvs(self.a,self.b)*teamO.numAutoDeckAttempted)
@@ -333,7 +341,7 @@ class EventRunner:
             result_entry.append(blue_autoDeck+blue_teleDeck)
             result_entry.append(blue_autoHull+blue_teleHull)
             result_entry.append(blue_autoNest+blue_teleNest)
-            result_entry.append(blue_endgameHoist)
+            result_entry.append(blue_endgameHoist) # Index 21
             # Append result
             results_list.append(result_entry)
             #print(result_entry) # debug
@@ -382,17 +390,17 @@ class EventRunner:
         print('n - Run next match')
         print('r - Show rankings')
         print('z - Run all remaining matches')
-        #print('s - Save event')
+        print('s - Save event (closes program for now)')
 
     """
     :param self
     :returns: None
     """
     def run_quals(self):
-        match_num = 1
+        match_num = self.last_qual_ran
         cChoice = ''
-        quals_toRun = len(schedule_list)
-        while match_num <= quals_toRun:
+        self.quals_toRun = len(self.schedule_list)
+        while match_num <= self.quals_toRun:
             match = schedule_list[match_num-1] # grab match object
             if self.run_rest_quals == 0:
                 self.quals_menu(match_num)
@@ -403,6 +411,7 @@ class EventRunner:
                     cChoice = cChoice[0]
                 if cChoice == 'n':
                     self.run_match(match,0,self.results_list_quals)
+                    self.last_qual_ran = match_num
                     match_num += 1
                     continue
                 elif cChoice == 'r':
@@ -411,16 +420,24 @@ class EventRunner:
                 elif cChoice == 'z':
                     self.run_rest_quals = 1
                     self.run_match(match,0,self.results_list_quals)
+                    self.last_qual_ran = match_num
                     match_num += 1
                     continue
+                elif cChoice == 's':
+                    #self.save_partial_event()
+                    break # break out of while loop (and quit method)
                 else:
                     print('Please enter a valid option.')
                     continue
             else:
                 self.run_match(match,0,self.results_list_quals)
+                self.last_qual_ran = match_num
                 match_num += 1
             # end while loop
-        self.qualsRan = 1
+        if self.last_qual_ran == self.quals_toRun:
+            self.qualsRan = 1
+        else:
+            print('Event ready to save on Qualification ',match_num)
         # end def run_quals
 
     """
@@ -1059,6 +1076,105 @@ class EventRunner:
             matchNum += 1
             # end of while loop
         self.calc_event_points()
+        # end of method
+
+    """
+    :param self
+    :returns: String representation of event code
+    """
+    def save_partial_event(self):
+        qFileName = 'Partial_Results/' + str(self.event_code) + 'Quals.csv'
+        with open(qFileName,'w',newline='') as qfile:
+            writer = csv.writer(qfile)
+            row1 = ['#','Red_1','Red_2','Red_3','Blue1','Blue2','Blue3','Red_Score','BlueScore','Result',
+                    'RedNav','RedRaise','RedDeck','RedHull','RedNest','RedHoist',
+                    'BlueNav','BlueRaise','BlueDeck','BlueHull','BlueNest','BlueHoist']
+            writer.writerow(row1)
+            writer.writerows(self.results_list_quals)
+        qfile.close()
+        if self.last_qual_ran == self.quals_toRun:
+            aFileName = 'Partial_Results/' + str(self.event_code) + 'Alliances.csv'
+            with open(aFileName, 'w', newline='') as afile:
+                writer = csv.writer(afile)
+                writer.writerows(self.alliances)
+            afile.close()
+        else:
+            mFileName = 'Partial_Results/' + str(self.event_code) + 'Schedule.csv'
+            with open(mFileName,'w',newline='') as mfile:
+                writer = csv.writer(mfile)
+                for match in self.schedule_list: # reverse engineered from generate_schedule_list method to allow for use on load
+                    row = []
+                    row[0] = match[0]
+                    for i in range(1,4):
+                        row[i] = match[1][i-1]
+                    for j in range(4,7):
+                        row[i] = match[2][i-4]
+                    writer.writerow(row)
+            mfile.close()
+        rFileName = 'Partial_Results/' + str(self.event_code) + 'Ranks.csv'
+        with open(rFileName,'w',newline='') as rfile:
+            writer = csv.writer(rfile)
+            rankNum = 1
+            row1 = ['Rank','Team#','W','L','T','#P','RP','Rank Score','Total Score','Nav','Anch','Deck','Hull','Nest','Sail']
+            writer.writerow(row1)
+            for rank in self.rankings:
+                row = [rankNum, rank.teamNum, rank.wins, rank.losses, rank.ties, rank.totalMatches, rank.RP, rank.RS,
+                        rank.totalScore, rank.Nav, rank.Anch, rank.Deck, rank.Hull, rank.Nest, rank.Sail]
+                rankNum += 1
+                writer.writerow(row)
+        rfile.close()
+        # elims next
+        return self.event_code
+
+    def load_partial_event(self):
+        qFileName = 'Partial_Results/' + str(self.event_code) + 'Quals.csv'
+        mFileName = 'Partial_Results/' + str(self.event_code) + 'Schedule.csv'
+        rFileName = 'Partial_Results/' + str(self.event_code) + 'Ranks.csv'
+        q_results_list = []
+        with open(qFileName) as qual_results:
+            reader = csv.reader(qual_results)
+            for row in reader:
+                q_results_list.append(row)
+        qual_results.close()
+        for result in q_results_list:
+            result_entry = []
+            for i in range(0.22):
+                result_entry.append(result[i]) # can load it straight when partially done
+            self.results_list_quals.append(result_entry)
+        if os.path.exists(mFileName): # match schedule exists, quals are NOT done
+            self.generate_schedule_list(mFileName)
+        else: # match schedule does not exist, quals are done!
+            aFileName = 'Partial_Results/' + str(self.event_code) + 'Alliances.csv'
+            with open(aFileName) as alliances:
+                reader = csv.reader(alliances)
+                i = 0
+                for row in reader:
+                    self.alliances[i] = row
+                    i += 1
+            alliances.close()
+        ranks_list = []
+        with open(rFileName) as current_ranks:
+            reader = csv.reader(current_ranks)
+            for row in reader:
+                ranks_list.append(row)
+        current_ranks.close()
+        for rank in ranks_list:
+            entry = RankEntry(int(rank[1])) # index 1 holds team number
+            entry.wins = int(rank[2])
+            entry.losses = int(rank[3])
+            entry.ties = int(rank[4])
+            entry.totalMatches = int(rank[5])
+            entry.RP = int(rank[6])
+            entry.RS = float(rank[7])
+            entry.totalScore = int(rank[8])
+            entry.Nav = int(rank[9])
+            entry.Anch = int(rank[10])
+            entry.Deck = int(rank[11])
+            entry.Hull = int(rank[12])
+            entry.Nest = int(rank[13])
+            entry.Sail = int(rank[14])
+            self.rankings.append(entry)
+        # elims next
         # end of method
 
     """

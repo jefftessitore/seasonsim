@@ -137,13 +137,14 @@ def menu():
     print('l - Load an event')
     print('q - Run Quals')
     print('p - Print ranks for current event')
-    print('a - Run Alliance Selection (All Quals must be complete)')
+    print('a - Run Alliance Selection (All Quals must be complete; must be run in one sitting)')
     print('e - Run Elims (Automatically calculates event points on completion)')
     print('r - Show match results')
-    print('s - Show Points from Event')
+    print('s - Show Points from event')
+    print('i - Save in-progress event (must be run even if saved from event menu to ensure proper encoding of savefiles)')
     print('d - Print leaderboards')
     print('f - Save event to csv')
-    print('b = Batch save (WARNING! Uses a lot of file storage)')
+    print('b - Batch save (WARNING! Uses a lot of file storage)')
     print('x - Exit the program')
 
 def save_everything():
@@ -510,6 +511,7 @@ sort_events(event_list,0)
 eventChoice = str('')
 cChoice = ''
 finished_events = []
+in_progress_events = []
 while True: 
     menu()
     cChoice = input('Enter choice --> ').strip()
@@ -519,7 +521,7 @@ while True:
         cChoice = cChoice[0]
     if cChoice == 'l': # load an event
         eventChoice = input('Enter Event Code: ')
-        eventRunning = EventRunner(eventChoice,leaderboard_list,event_list,team_list)
+        eventRunning = EventRunner(eventChoice,leaderboard_list,event_list,team_list,0)
     elif cChoice == 'q': # Run quals at event
         eventRunning.run_quals()
     elif cChoice == 'p': # Print ranks at event
@@ -528,12 +530,14 @@ while True:
         eventRunning.run_alliance_selection()
     elif cChoice == 'e': # Run Elims
         eventRunning.run_elims()
-        pass
     elif cChoice == 'r': # Show results
         resultType = input('Enter q, a, or e for quals, alliance selection, and elims results, respectively: ')
         eventRunning.show_results(resultType)
     elif cChoice == 's': # Show points from event
         eventRunning.show_event_points()
+    elif cChoice == 'i': # Save in-progress event
+        eventCode = eventRunning.save_partial_event()
+        in_progress_events.append(eventCode)
     elif cChoice == 'd': # Show district leaderboards
         display_leaderboards()
     elif cChoice == 'f': # Save event to csv
