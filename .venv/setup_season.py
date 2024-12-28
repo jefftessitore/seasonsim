@@ -520,8 +520,11 @@ while True:
     else:
         cChoice = cChoice[0]
     if cChoice == 'l': # load an event
-        eventChoice = input('Enter Event Code: ')
-        eventRunning = EventRunner(eventChoice,leaderboard_list,event_list,team_list,0)
+        eventChoice = input('Enter Event Code: ').strip()
+        if eventChoice in in_progress_events:
+            eventRunning = EventRunner(eventChoice,leaderboard_list,event_list,team_list,1)
+        else:
+            eventRunning = EventRunner(eventChoice,leaderboard_list,event_list,team_list,0)
     elif cChoice == 'q': # Run quals at event
         eventRunning.run_quals()
     elif cChoice == 'p': # Print ranks at event

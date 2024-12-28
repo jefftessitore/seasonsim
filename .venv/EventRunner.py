@@ -51,7 +51,7 @@ class EventRunner:
         self.declined_teams = []
         self.declined_picks = []
         self.run_rest_quals = 0
-        self.last_qual_ran = 1
+        self.last_qual_ran = 0
         self.quals_toRun = len(self.schedule_list)
         self.loaded = loaded_from_save # 0 or 1
         if self.loaded:
@@ -266,114 +266,155 @@ class EventRunner:
             blue_endgameRaise += 1 if random() < (teamO.percentRaise + percent_adjust) else 0
             #print('Blue done')
             # end of for loop
+        self.calculate_scores(type,match_num,red_alliance,blue_alliance,
+                              red_autoMobile,red_autoDeck,red_autoHull,red_autoMast,red_autoNest,
+                              blue_autoMobile,blue_autoDeck,blue_autoHull,blue_autoMast,blue_autoNest,
+                              deck_score,
+                              red_teleDeck,red_teleHull,red_teleMast,red_teleNest,
+                              blue_teleDeck,blue_teleHull,blue_teleMast,blue_teleNest,
+                              hoist_score,
+                              red_endgameHoist,red_endgameRaise,red_endgameNav,
+                              blue_endgameHoist,blue_endgameRaise,blue_endgameNav,
+                              raise_score,1,None,None,None)
+        # end of method
+
+    def calculate_scores(self,type,match_num,red_alliance,blue_alliance,
+                              red_autoMobile,red_autoDeck,red_autoHull,red_autoMast,red_autoNest,
+                              blue_autoMobile,blue_autoDeck,blue_autoHull,blue_autoMast,blue_autoNest,
+                              deck_score,
+                              red_teleDeck,red_teleHull,red_teleMast,red_teleNest,
+                              blue_teleDeck,blue_teleHull,blue_teleMast,blue_teleNest,
+                              hoist_score,
+                              red_endgameHoist,red_endgameRaise,red_endgameNav,
+                              blue_endgameHoist,blue_endgameRaise,blue_endgameNav,
+                              raise_score,fromRunMatch,given_result_array,given_scores,given_RPs):
         # Calculate scores
-        red_autoScore = 2*red_autoMobile + 4*red_autoDeck + 9*red_autoHull + 3*red_autoMast + 10*red_autoNest
-        blue_autoScore = 2*blue_autoMobile + 4*blue_autoDeck + 9*blue_autoHull + 3*blue_autoMast + 10*blue_autoNest
-        red_teleScore = deck_score*red_teleDeck + 4*red_teleHull + 2*red_teleMast + 5*red_teleNest
-        blue_teleScore = deck_score*blue_teleDeck + 4*blue_teleHull + 2*blue_teleMast + 5*blue_teleNest
-        red_endgameScore = hoist_score*red_endgameHoist + raise_score*red_endgameRaise + 15*red_endgameNav
-        blue_endgameScore = hoist_score*blue_endgameHoist + raise_score*blue_endgameRaise + 15*blue_endgameNav
-        red_totalScore = int(red_autoScore + red_teleScore + red_endgameScore) # Typecasting just in case
-        blue_totalScore = int(blue_autoScore + blue_teleScore + blue_endgameScore) # Typecasting just in case
-        redwin = 0
-        redloss = 0
-        redtie = 0
-        bluewin = 0
-        blueloss = 0
-        bluetie = 0
-        red_bonusRP = 0
-        blue_bonusRP = 0
-        if red_totalScore == blue_totalScore:
-            result = 'TIE'
-            (redtie, bluetie) = (1, 1)
-        elif red_totalScore > blue_totalScore:
-            result = 'RED'
-            (redwin, blueloss) = (1, 1)
-        else: # red < blue
-            result = 'BLUE'
-            (redloss, bluewin) = (1, 1)
-        #print('Result calculated')
-        if type == 0: #qual
-            red_bonusRP += 1 if red_endgameRaise >= 3 and (red_autoDeck + red_teleDeck) >= 25 else 0
-            red_bonusRP += 1 if red_endgameHoist >= 2 else 0
-            blue_bonusRP += 1 if blue_endgameRaise >= 3 and (blue_autoDeck + blue_teleDeck) >= 25 else 0
-            blue_bonusRP += 1 if blue_endgameHoist >= 2 else 0
-            if result.__eq__('TIE'):
-                red_totalRP = 1 + red_bonusRP
-                blue_totalRP = 1 + blue_bonusRP
-            elif result.__eq__('RED'):
-                red_totalRP = 2 + red_bonusRP
-                blue_totalRP = blue_bonusRP
-            else:
-                red_totalRP = red_bonusRP
-                blue_totalRP = 2 + blue_bonusRP
-            for team in red_alliance:
-                rankEntry = self.find_rank_entry(team)
-                rankEntry.update_entry(int(redwin),int(redloss),int(redtie),int(red_totalRP),int(red_totalScore),int(15*red_endgameNav),int(2*red_endgameRaise),int(4*red_autoDeck+2*red_teleDeck),int(9*red_autoHull+4*red_teleHull),int(10*red_autoNest+5*red_teleNest),int(red_endgameHoist))
-            for team in blue_alliance:
-                rankEntry = self.find_rank_entry(team)
-                rankEntry.update_entry(int(bluewin),int(blueloss),int(bluetie),int(blue_totalRP),int(blue_totalScore),int(15*blue_endgameNav),int(2*blue_endgameRaise),int(4*blue_autoDeck+2*blue_teleDeck),int(9*blue_autoHull+4*blue_teleHull),int(10*blue_autoNest+5*blue_teleNest),int(blue_endgameHoist))
-            result_entry = []
-            # Displayed
-            result_entry.append(match_num)
-            for team in red_alliance:
-                result_entry.append(int(team))
-            for team in blue_alliance:
-                result_entry.append(int(team))
-            redScoreString = str(red_totalScore)
-            blueScoreString = str(blue_totalScore)
-            for i in range(red_bonusRP):
-                redScoreString = redScoreString + '•'
-            for i in range(blue_bonusRP):
-                blueScoreString = blueScoreString + '•'
-            result_entry.append(redScoreString)
-            result_entry.append(blueScoreString)
-            result_entry.append(result) # Index 9
-            # Never displayed, used in OPR calculations
-            result_entry.append(red_endgameNav) # Index 10
-            result_entry.append(red_endgameRaise)
-            result_entry.append(red_autoDeck+red_teleDeck)
-            result_entry.append(red_autoHull+red_teleHull)
-            result_entry.append(red_autoNest+red_teleNest)
-            result_entry.append(red_endgameHoist)
-            result_entry.append(blue_endgameNav) # Index 16
-            result_entry.append(blue_endgameRaise)
-            result_entry.append(blue_autoDeck+blue_teleDeck)
-            result_entry.append(blue_autoHull+blue_teleHull)
-            result_entry.append(blue_autoNest+blue_teleNest)
-            result_entry.append(blue_endgameHoist) # Index 21
-            # Append result
-            results_list.append(result_entry)
-            #print(result_entry) # debug
-            if self.run_rest_quals == 0:
-                #print('Match#','Red_1','Red_2','Red_3','Blue1','Blue2','Blue3','Red_Score','BlueScore','Result')
-                print('Match Num: ',result_entry[0],
-                      '\nRed: ',result_entry[1],result_entry[2],result_entry[3],
-                      '\nBlue: ',result_entry[4],result_entry[5],result_entry[6],
-                      '\nScores and Result: ',result_entry[7],result_entry[8],result_entry[9])
-        else: # elim
-            #print('Made it to else statement')
-            result_entry = []
-            match_num = int(match_num)
-            result_entry.append(match_num)
-            for team in red_alliance:
-                result_entry.append(int(team))
-            for team in blue_alliance:
-                result_entry.append(int(team))
-            result_entry.append(red_totalScore)
-            result_entry.append(blue_totalScore)
+        if fromRunMatch == 1:
+            red_autoScore = 2*red_autoMobile + 4*red_autoDeck + 9*red_autoHull + 3*red_autoMast + 10*red_autoNest
+            blue_autoScore = 2*blue_autoMobile + 4*blue_autoDeck + 9*blue_autoHull + 3*blue_autoMast + 10*blue_autoNest
+            red_teleScore = deck_score*red_teleDeck + 4*red_teleHull + 2*red_teleMast + 5*red_teleNest
+            blue_teleScore = deck_score*blue_teleDeck + 4*blue_teleHull + 2*blue_teleMast + 5*blue_teleNest
+            red_endgameScore = hoist_score*red_endgameHoist + raise_score*red_endgameRaise + 15*red_endgameNav
+            blue_endgameScore = hoist_score*blue_endgameHoist + raise_score*blue_endgameRaise + 15*blue_endgameNav
+            red_totalScore = int(red_autoScore + red_teleScore + red_endgameScore) # Typecasting just in case
+            blue_totalScore = int(blue_autoScore + blue_teleScore + blue_endgameScore) # Typecasting just in case
+            redwin = 0
+            redloss = 0
+            redtie = 0
+            bluewin = 0
+            blueloss = 0
+            bluetie = 0
+            red_bonusRP = 0
+            blue_bonusRP = 0
             if red_totalScore == blue_totalScore:
                 result = 'TIE'
-                print('Tie, replaying')
-                self.run_match(match,1,self.results_list_elims) # rerun before appending kek
+                (redtie, bluetie) = (1, 1)
             elif red_totalScore > blue_totalScore:
                 result = 'RED'
+                (redwin, blueloss) = (1, 1)
             else: # red < blue
                 result = 'BLUE'
-            result_entry.append(result)
-            #print('Result entry appended')
-            #print(result_entry)
-            self.results_list_elims.append(result_entry)
+                (redloss, bluewin) = (1, 1)
+            #print('Result calculated')
+            if type == 0: #qual
+                red_bonusRP += 1 if red_endgameRaise >= 3 and (red_autoDeck + red_teleDeck) >= 25 else 0
+                red_bonusRP += 1 if red_endgameHoist >= 2 else 0
+                blue_bonusRP += 1 if blue_endgameRaise >= 3 and (blue_autoDeck + blue_teleDeck) >= 25 else 0
+                blue_bonusRP += 1 if blue_endgameHoist >= 2 else 0
+                if result.__eq__('TIE'):
+                    red_totalRP = 1 + red_bonusRP
+                    blue_totalRP = 1 + blue_bonusRP
+                elif result.__eq__('RED'):
+                    red_totalRP = 2 + red_bonusRP
+                    blue_totalRP = blue_bonusRP
+                else:
+                    red_totalRP = red_bonusRP
+                    blue_totalRP = 2 + blue_bonusRP
+                for team in red_alliance:
+                    rankEntry = self.find_rank_entry(team)
+                    rankEntry.update_entry(int(redwin),int(redloss),int(redtie),int(red_totalRP),int(red_totalScore),int(red_endgameNav),int(red_endgameRaise),int(red_autoDeck+red_teleDeck),int(red_autoHull+red_teleHull),int(red_autoNest+red_teleNest),int(red_endgameHoist))
+                for team in blue_alliance:
+                    rankEntry = self.find_rank_entry(team)
+                    rankEntry.update_entry(int(bluewin),int(blueloss),int(bluetie),int(blue_totalRP),int(blue_totalScore),int(blue_endgameNav),int(blue_endgameRaise),int(blue_autoDeck+blue_teleDeck),int(blue_autoHull+blue_teleHull),int(blue_autoNest+blue_teleNest),int(blue_endgameHoist))
+                result_entry = []
+                # Displayed
+                result_entry.append(match_num)
+                for team in red_alliance:
+                    result_entry.append(int(team))
+                for team in blue_alliance:
+                    result_entry.append(int(team))
+                redScoreString = str(red_totalScore)
+                blueScoreString = str(blue_totalScore)
+                for i in range(red_bonusRP):
+                    redScoreString = redScoreString + '•'
+                for i in range(blue_bonusRP):
+                    blueScoreString = blueScoreString + '•'
+                result_entry.append(redScoreString)
+                result_entry.append(blueScoreString)
+                result_entry.append(result) # Index 9
+                # Never displayed, used in OPR calculations
+                result_entry.append(red_endgameNav) # Index 10
+                result_entry.append(red_endgameRaise)
+                result_entry.append(red_autoDeck+red_teleDeck)
+                result_entry.append(red_autoHull+red_teleHull)
+                result_entry.append(red_autoNest+red_teleNest)
+                result_entry.append(red_endgameHoist)
+                result_entry.append(blue_endgameNav) # Index 16
+                result_entry.append(blue_endgameRaise)
+                result_entry.append(blue_autoDeck+blue_teleDeck)
+                result_entry.append(blue_autoHull+blue_teleHull)
+                result_entry.append(blue_autoNest+blue_teleNest)
+                result_entry.append(blue_endgameHoist) # Index 21
+                # Append result
+                self.results_list_quals.append(result_entry)
+                #print(result_entry) # debug
+                if self.run_rest_quals == 0:
+                    #print('Match#','Red_1','Red_2','Red_3','Blue1','Blue2','Blue3','Red_Score','BlueScore','Result')
+                    print('Match Num: ',result_entry[0],
+                          '\nRed: ',result_entry[1],result_entry[2],result_entry[3],
+                          '\nBlue: ',result_entry[4],result_entry[5],result_entry[6],
+                          '\nScores and Result: ',result_entry[7],result_entry[8],result_entry[9])
+            else: # elim
+                #print('Made it to else statement')
+                result_entry = []
+                match_num = int(match_num)
+                result_entry.append(match_num)
+                for team in red_alliance:
+                    result_entry.append(int(team))
+                for team in blue_alliance:
+                    result_entry.append(int(team))
+                result_entry.append(red_totalScore)
+                result_entry.append(blue_totalScore)
+                if red_totalScore == blue_totalScore:
+                    result = 'TIE'
+                    print('Tie, replaying')
+                    self.run_match(match,1,self.results_list_elims) # rerun before appending kek
+                elif red_totalScore > blue_totalScore:
+                    result = 'RED'
+                else: # red < blue
+                    result = 'BLUE'
+                result_entry.append(result)
+                #print('Result entry appended')
+                #print(result_entry)
+                self.results_list_elims.append(result_entry)
+        else: # from partial load
+                redwin = int(given_result_array[0])
+                redloss = int(given_result_array[1])
+                redtie = int(given_result_array[2])
+                bluewin = int(given_result_array[3])
+                blueloss = int(given_result_array[4])
+                bluetie = int(given_result_array[5])
+                red_totalScore = int(given_scores[0])
+                blue_totalScore = int(given_scores[1])
+                red_totalRP = int(given_RPs[0])
+                blue_totalRP = int(given_RPs[1])
+                for team in red_alliance:
+                    rankEntry = self.find_rank_entry(int(str(team).strip()))
+                    rankEntry.update_entry(int(redwin),int(redloss),int(redtie),int(red_totalRP),int(red_totalScore),int(red_endgameNav),int(red_endgameHoist),int(red_teleDeck),int(red_teleHull),int(red_teleNest),int(red_endgameHoist))
+                for team in blue_alliance:
+                    rankEntry = self.find_rank_entry(int(str(team).strip()))
+                    rankEntry.update_entry(int(bluewin),int(blueloss),int(bluetie),int(blue_totalRP),int(blue_totalScore),int(blue_endgameNav),int(blue_endgameHoist),int(blue_teleDeck),int(blue_teleHull),int(blue_teleNest),int(blue_endgameHoist))
+        # end of method
 
     """
     :param self
@@ -390,18 +431,18 @@ class EventRunner:
         print('n - Run next match')
         print('r - Show rankings')
         print('z - Run all remaining matches')
-        print('s - Save event (closes program for now)')
+        print('s - Save event')
 
     """
     :param self
     :returns: None
     """
     def run_quals(self):
-        match_num = self.last_qual_ran
+        match_num = self.last_qual_ran + 1
         cChoice = ''
         self.quals_toRun = len(self.schedule_list)
         while match_num <= self.quals_toRun:
-            match = schedule_list[match_num-1] # grab match object
+            match = self.schedule_list[match_num-1] # grab match object
             if self.run_rest_quals == 0:
                 self.quals_menu(match_num)
                 cChoice = input('Enter choice --> ').strip()
@@ -1086,10 +1127,6 @@ class EventRunner:
         qFileName = 'Partial_Results/' + str(self.event_code) + 'Quals.csv'
         with open(qFileName,'w',newline='') as qfile:
             writer = csv.writer(qfile)
-            row1 = ['#','Red_1','Red_2','Red_3','Blue1','Blue2','Blue3','Red_Score','BlueScore','Result',
-                    'RedNav','RedRaise','RedDeck','RedHull','RedNest','RedHoist',
-                    'BlueNav','BlueRaise','BlueDeck','BlueHull','BlueNest','BlueHoist']
-            writer.writerow(row1)
             writer.writerows(self.results_list_quals)
         qfile.close()
         if self.last_qual_ran == self.quals_toRun:
@@ -1103,20 +1140,21 @@ class EventRunner:
             with open(mFileName,'w',newline='') as mfile:
                 writer = csv.writer(mfile)
                 for match in self.schedule_list: # reverse engineered from generate_schedule_list method to allow for use on load
-                    row = []
-                    row[0] = match[0]
-                    for i in range(1,4):
-                        row[i] = match[1][i-1]
-                    for j in range(4,7):
-                        row[i] = match[2][i-4]
-                    writer.writerow(row)
+                    if len(match) > 0:
+                        row = []
+                        row.append(match[0])
+                        for i in range(1,4):
+                            row.append(match[1][i-1])
+                        for j in range(4,7):
+                            row.append(match[2][i-4])
+                        writer.writerow(row)
+                    else:
+                        continue
             mfile.close()
         rFileName = 'Partial_Results/' + str(self.event_code) + 'Ranks.csv'
         with open(rFileName,'w',newline='') as rfile:
             writer = csv.writer(rfile)
             rankNum = 1
-            row1 = ['Rank','Team#','W','L','T','#P','RP','Rank Score','Total Score','Nav','Anch','Deck','Hull','Nest','Sail']
-            writer.writerow(row1)
             for rank in self.rankings:
                 row = [rankNum, rank.teamNum, rank.wins, rank.losses, rank.ties, rank.totalMatches, rank.RP, rank.RS,
                         rank.totalScore, rank.Nav, rank.Anch, rank.Deck, rank.Hull, rank.Nest, rank.Sail]
@@ -1138,11 +1176,71 @@ class EventRunner:
         qual_results.close()
         for result in q_results_list:
             result_entry = []
-            for i in range(0.22):
+            for i in range(0,22):
                 result_entry.append(result[i]) # can load it straight when partially done
             self.results_list_quals.append(result_entry)
+        curMatch = 1
+        deck_score = 2
+        hoist_score = 0
+        raise_score = 2
+        for result in self.results_list_quals:
+            win_result = str(result[9]).strip()
+            red_alliance = result[1:4]
+            blue_alliance = result[4:7]
+            red_bonusRP = 0
+            blue_bonusRP = 0
+            red_scoreString = str(result[7]).strip()
+            blue_scoreString = str(result[8]).strip()
+            red_bonusRP = red_scoreString.count('•')
+            blue_bonusRP = blue_scoreString.count('•')
+            if red_bonusRP > 0:  # if bullet character present in string
+                red_totalScore = int(red_scoreString[:red_scoreString.find('•')])
+            else:
+                red_totalScore = int(red_scoreString)
+            if blue_bonusRP > 0:
+                blue_totalScore = int(blue_scoreString[:blue_scoreString.find('•')])
+            else:
+                blue_totalScore = int(blue_scoreString)
+            redwin = 0
+            redloss = 0
+            redtie = 0
+            bluewin = 0
+            blueloss = 0
+            bluetie = 0
+            if win_result.__eq__('TIE'):
+                (redtie, bluetie) = (1, 1)
+                red_totalRP = 1 + red_bonusRP
+                blue_totalRP = 1 + blue_bonusRP
+            elif win_result.__eq__('RED'):
+                (redwin, blueloss) = (1, 1)
+                red_totalRP = 2 + red_bonusRP
+                blue_totalRP = blue_bonusRP
+            else:  # result.__eq__('BLUE')
+                (redloss, bluewin) = (1, 1)
+                red_totalRP = red_bonusRP
+                blue_totalRP = 2 + blue_bonusRP
+            # these will all be given straight
+            red_endgameNav = float(str(result[10]).strip())
+            red_endgameRaise = float(str(result[11]).strip())
+            red_totalDeck = float(str(result[12]).strip())
+            red_totalHull = float(str(result[13]).strip())
+            red_totalNest = float(str(result[14]).strip())
+            red_endgameHoist = float(str(result[15]).strip())
+            blue_endgameNav = float(str(result[16]).strip())
+            blue_endgameRaise = float(str(result[17]).strip())
+            blue_totalDeck = float(str(result[18]).strip())
+            blue_totalHull = float(str(result[19]).strip())
+            blue_totalNest = float(str(result[20]).strip())
+            blue_endgameHoist = float(str(result[21]).strip())
+            self.calculate_scores(0,curMatch,red_alliance,blue_alliance,
+                                  0,0,0,0,0,0,0,0,0,0,
+                                  deck_score,red_totalDeck,red_totalHull,0,red_totalNest,blue_totalDeck,blue_totalHull,0,blue_totalNest,
+                                  hoist_score,red_endgameHoist,red_endgameRaise,red_endgameNav,blue_endgameHoist,blue_endgameRaise,blue_endgameNav,
+                                  raise_score,0,[redwin,redloss,redtie,bluewin,blueloss,bluetie],[red_totalScore,blue_totalScore],[red_totalRP,blue_totalRP])
+            curMatch += 1
+        self.last_qual_ran = len(self.results_list_quals)
         if os.path.exists(mFileName): # match schedule exists, quals are NOT done
-            self.generate_schedule_list(mFileName)
+            pass # already preloading match schedule!
         else: # match schedule does not exist, quals are done!
             aFileName = 'Partial_Results/' + str(self.event_code) + 'Alliances.csv'
             with open(aFileName) as alliances:
@@ -1152,6 +1250,8 @@ class EventRunner:
                     self.alliances[i] = row
                     i += 1
             alliances.close()
+
+        ''' #Don't actually need because changed to scoring on separate method
         ranks_list = []
         with open(rFileName) as current_ranks:
             reader = csv.reader(current_ranks)
@@ -1174,6 +1274,7 @@ class EventRunner:
             entry.Nest = int(rank[13])
             entry.Sail = int(rank[14])
             self.rankings.append(entry)
+            '''
         # elims next
         # end of method
 
