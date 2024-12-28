@@ -426,12 +426,17 @@ class EventRunner:
             if int(str(rank.teamNum).strip()) == int(str(teamNum).strip()):
                 return rank
 
+    def print_schedule(self):
+        for match in self.schedule_list:
+            print(match) # very badly formatted, placeholder for now
+
     def quals_menu(self,match_num):
         print('Next match: Qualification ',int(match_num)) # typecast JUST IN CASE
         print('n - Run next match')
         print('r - Show rankings')
         print('z - Run all remaining matches')
         print('s - Save event')
+        print('p - Print schedule')
 
     """
     :param self
@@ -467,6 +472,9 @@ class EventRunner:
                 elif cChoice == 's':
                     #self.save_partial_event()
                     break # break out of while loop (and quit method)
+                elif cChoice == 'p':
+                    self.print_schedule()
+                    continue
                 else:
                     print('Please enter a valid option.')
                     continue
