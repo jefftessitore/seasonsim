@@ -275,7 +275,7 @@ class EventRunner:
                               hoist_score,
                               red_endgameHoist,red_endgameRaise,red_endgameNav,
                               blue_endgameHoist,blue_endgameRaise,blue_endgameNav,
-                              raise_score,1,None,None,None)
+                              raise_score,1,None,None,None,match)
         # end of method
 
     def calculate_scores(self,type,match_num,red_alliance,blue_alliance,
@@ -287,7 +287,7 @@ class EventRunner:
                               hoist_score,
                               red_endgameHoist,red_endgameRaise,red_endgameNav,
                               blue_endgameHoist,blue_endgameRaise,blue_endgameNav,
-                              raise_score,fromRunMatch,given_result_array,given_scores,given_RPs):
+                              raise_score,fromRunMatch,given_result_array,given_scores,given_RPs,match):
         # Calculate scores
         if fromRunMatch == 1:
             red_autoScore = 2*red_autoMobile + 4*red_autoDeck + 9*red_autoHull + 3*red_autoMast + 10*red_autoNest
@@ -1244,7 +1244,7 @@ class EventRunner:
                                   0,0,0,0,0,0,0,0,0,0,
                                   deck_score,red_totalDeck,red_totalHull,0,red_totalNest,blue_totalDeck,blue_totalHull,0,blue_totalNest,
                                   hoist_score,red_endgameHoist,red_endgameRaise,red_endgameNav,blue_endgameHoist,blue_endgameRaise,blue_endgameNav,
-                                  raise_score,0,[redwin,redloss,redtie,bluewin,blueloss,bluetie],[red_totalScore,blue_totalScore],[red_totalRP,blue_totalRP])
+                                  raise_score,0,[redwin,redloss,redtie,bluewin,blueloss,bluetie],[red_totalScore,blue_totalScore],[red_totalRP,blue_totalRP],None)
             curMatch += 1
         self.last_qual_ran = len(self.results_list_quals)
         if os.path.exists(mFileName): # match schedule exists, quals are NOT done
