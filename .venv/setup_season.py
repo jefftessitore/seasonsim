@@ -142,7 +142,7 @@ def menu():
     print('r - Show match results')
     print('s - Show Points from event')
     print('i - Save in-progress event (must be run even if saved from event menu to ensure proper encoding of savefiles)')
-    print('d - Print leaderboards')
+    #print('d - Print leaderboards')
     print('f - Save event to csv')
     print('b - Batch save (WARNING! Uses a lot of file storage)')
     print('x - Exit the program')
@@ -541,8 +541,8 @@ while True:
     elif cChoice == 'i': # Save in-progress event
         eventCode = eventRunning.save_partial_event()
         in_progress_events.append(eventCode)
-    elif cChoice == 'd': # Show district leaderboards
-        display_leaderboards()
+    #elif cChoice == 'd': # Show district leaderboards
+    #    display_leaderboards()
     elif cChoice == 'f': # Save event to csv
         eventRunning.save_event()
         finished_events.append(eventRunning)
