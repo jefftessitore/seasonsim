@@ -106,15 +106,19 @@ def get_var_name(var): # Stolen from the internet
             return name
 
 def display_leaderboards():
+    i = 0
+    print('Code - Leaderboard')
     for leaderboard in leaderboard_list:
-        leaderboard.update()
-        sort_leaderboard(leaderboard)
-        print('{:s} Leaderboard.'.format(leaderboard.sIdentifier))
-        print('Rank | Team# | Total')
-        rank = 1
-        for entry in leaderboard.leaderboard:
-            print('{:4d} | {:5d} | {:5d}'.format(rank,int(entry.teamNum),int(entry.total)))
-            rank += 1
+        print(i,' - ',leaderboard.sIdentifier)
+        i += 1
+    chosenLB = int(input('Enter choice --> ').strip())%13 # takes input and moduluses(?) it with # available to prevent trolling
+    print(leaderboard_list[chosenLB].sIdentifier)
+    for team in leaderboard_list[chosenLB].teams:
+        print(team)
+    for event in leaderboard_list[chosenLB].events:
+        print(event.sCode)
+    #for entry in leaderboard_list[chosenLB].leaderboard:
+    #    print(entry.teamNum)
 
 def sort_leaderboard(leaderboard):
     n = len(leaderboard.leaderboard)
@@ -142,7 +146,7 @@ def menu():
     print('r - Show match results')
     print('s - Show Points from event')
     print('i - Save in-progress event (must be run even if saved from event menu to ensure proper encoding of savefiles)')
-    #print('d - Print leaderboards')
+    print('d - Print leaderboard (choice given upon selection)')
     print('f - Save event to csv')
     print('b - Batch save (WARNING! Uses a lot of file storage)')
     print('x - Exit the program')
@@ -192,41 +196,45 @@ def save_everything():
             row.append(str(team.numTeleDeckAttempted))
             writer.writerow(row)
     teamSave.close()
-    '''
-    with open('allevents.csv','w',newline='') as eventSave:
-        writer = csv.writer(eventSave)
-        eventrows = []
-        #for event in completed_events: save event code to look for in official results folder
-        for event in finished_events:
-            row = []
-            row.append(event.event_code)
-            writer.writerow(row)
-    eventSave.close()'''
     with open('allleaderboards.csv','w',newline='') as lbSave:
+        #print('Saving leaderboards...')
         writer = csv.writer(lbSave)
         leaderboardrows = []
+        #print(leaderboard_list)
         for leaderboard in leaderboard_list:
+            #print(leaderboard.sIdentifier)
             row = []
             row.append(leaderboard.sIdentifier)
             for team in leaderboard.teams:
+                #print(team)
                 row.append(team)
             row.append(int(-99999)) # pad with -99999
             for eventO in leaderboard.events:
+                #print(eventO.sCode)
                 row.append(eventO.sCode)
             row.append(int(-99999))
             for entry in leaderboard.leaderboard:
+                #print(entry.teamNum)
                 row.append(entry.teamNum)
                 for score in entry.eventScores:
+                    #print(score)
                     row.append(score)
                 row.append(99999) # +99999 to pad
+                #print(entry.dcmp)
                 row.append(entry.dcmp)
+                #print(entry.dcmpQ)
                 row.append(entry.dcmpQ)
+                #print(entry.champQ)
                 row.append(entry.champQ)
+                #print(entry.total)
                 row.append(entry.total)
                 row.append(-99998) # need to pad each entry
             row.append(-99999) # look for last -99999
+            #print(leaderboard.isRegional)
             row.append(leaderboard.isRegional)
-        writer.writerows(leaderboardrows) # Welp
+            leaderboardrows.append(row) # You have GOT to be kidding me
+        #print(leaderboardrows)
+        writer.writerows(leaderboardrows)
     lbSave.close() # Agh
                 
     status = [[1]]
@@ -379,6 +387,7 @@ if (preloaded == 0):
     
     for leaderboard in leaderboard_list:
         leaderboard.build_leaderboard_list() # internal
+    leaderboard_list[0].isRegional = 1
 # end if preload == 0
 else:
     #print('Preloading from save...')
@@ -465,9 +474,41 @@ else:
     leaderboard_list.append(ont_leaderboard)
     leaderboard_list.append(pch_leaderboard)
     leaderboard_list.append(pnw_leaderboard)
+    for team in team_list:
+        team_num = team.iTeamNum
+        team_district = team.sDistrict.strip()
+        if team_district.__eq__('Regional'):
+            regional_leaderboard.teams.append(int(team_num))
+        elif team_district.__eq__('CHS'):
+            chs_leaderboard.teams.append(int(team_num))
+        elif team_district.__eq__('FIM'):
+            fim_leaderboard.teams.append(int(team_num))
+        elif team_district.__eq__('FIN'):
+            fin_leaderboard.teams.append(int(team_num))
+        elif team_district.__eq__('FIT'):
+            fit_leaderboard.teams.append(int(team_num))
+        elif team_district.__eq__('FMA'):
+            fma_leaderboard.teams.append(int(team_num))
+        elif team_district.__eq__('FNC'):
+            fnc_leaderboard.teams.append(int(team_num))
+        elif team_district.__eq__('FSC'):
+            fsc_leaderboard.teams.append(int(team_num))
+        elif team_district.__eq__('ISR'):
+            isr_leaderboard.teams.append(int(team_num))
+        elif team_district.__eq__('NE'):
+            ne_leaderboard.teams.append(int(team_num))
+        elif team_district.__eq__('ONT'):
+            ont_leaderboard.teams.append(int(team_num))
+        elif team_district.__eq__('PCH'):
+            pch_leaderboard.teams.append(int(team_num))
+        elif team_district.__eq__('PNW'):
+            pnw_leaderboard.teams.append(int(team_num))
+
     for leaderboard,lbRow in zip(leaderboard_list,lbSaveRows):
+        #print(lbRow)
         i = 0
         leaderboard.sIdentifier = lbRow[i]
+        i += 2 # skip -99999
         teams = []
         while int(lbRow[i]) != -99999 and i < len(lbRow):
             teams.append(int(lbRow[i]))
@@ -477,8 +518,12 @@ else:
         while (len(str(lbRow[i])) == 4 or len(str(lbRow[i])) == 5) and int(lbRow[i] != -99999):
             eventCodes.append(str(lbRow[i]))
             i += 1
-        i += 1 # skip next -99999
+        i += 2 # skip next -99999
         rowIsRegional = int(lbRow[-1])
+        i += 1
+        if i == len(lbRow):
+            leaderboard.leaderboard = None
+            continue
         entries = []
         while i < len(lbRow) and int(lbRow[i]) != -99999: # we padded with +99999 and -99998 so we should be fine here
             teamNum = int(lbRow[i]) # expecting teamNum of first entry here
@@ -503,6 +548,12 @@ else:
         leaderboard.leaderboard = entries.copy()
         leaderboard.isRegional = rowIsRegional
     # end of for loop
+    leaderboard_list[0].isRegional = 1 # override because yes
+    # need to fill empty entries
+    for leaderboard in leaderboard_list:
+        if leaderboard.leaderboard is None:
+            leaderboard.leaderboard = []
+            leaderboard.build_leaderboard_list()
 #end else
 event_list = preload_events(event_row_list)
 sort_events(event_list,1)
@@ -541,8 +592,8 @@ while True:
     elif cChoice == 'i': # Save in-progress event
         eventCode = eventRunning.save_partial_event()
         in_progress_events.append(eventCode)
-    #elif cChoice == 'd': # Show district leaderboards
-    #    display_leaderboards()
+    elif cChoice == 'd': # Show district leaderboards
+        display_leaderboards()
     elif cChoice == 'f': # Save event to csv
         eventRunning.save_event()
         finished_events.append(eventRunning)
