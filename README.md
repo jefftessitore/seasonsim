@@ -47,10 +47,10 @@ The math calculations behind match simulation are getting an overhaul at some po
 * Qualification matches run one at a time
 * Events can be saved/loaded during qualification rounds
 * Added method to parse official results files given an event code to calculate event points. Saving with save_everything() failed and I failed to notice until a few events in and decided to just roll with it. I saved everything in such a way to make it as modular as possible.
+* Added method to parse points from each event to calculate which Regional teams qualify for the World Championship (top 3 by points) and update team with that information.
 
 ## Extra Code/sometimes FRC-related To-Do Things for Fellow Nerds:
 #### more or less organized strictly code related --> strictly FRC related
 
 * Add methods to create, append to, save, load, and read regional pool/regional leaderboard. Saving the leaderboard failed with save_everything() similar to event points. As I approach the end of Week 2 of my initial test, this becomes a requirement before moving on.
-* Add method to parse points from each event to calculate which Regional teams qualify for the World Championship (top 3 by points) and update team with that information.
 * With the kickoff of FRC Reefscape, we found out that this game has a maximum of 6 RP available to an alliance instead of 4. I decided to go ahead and add offseason functionality and support for choosing prebuilt FRC games to the "On Deck" category, as I'd like to get started on potentially making an FRC game with 6 possible RP and leave it on the backburner just in case this is the new normal rather than a one-off for 2025. I'd test it with "offseason events" (one-off events that I don't want to save to an official results folder), so I'd likely work on these in tandem or immediately after the other.
