@@ -921,7 +921,7 @@ class EventRunner:
             for lbEntry in self.leaderboard.leaderboard:
                 if int(lbEntry.teamNum) == int(team.iTeamNum):
                     lbEntry.eventScores.append(event_points)
-            points_entry = [int(team.iTeamNum),event_points]
+            points_entry = [int(team.iTeamNum),event_points,int(qp),int(ap),int(ep)]
             self.points_from_event.append(points_entry)
         # end of outer for loop
         self.event_complete = 1

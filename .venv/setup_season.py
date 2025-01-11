@@ -9,6 +9,7 @@ import csv
 import random
 import inspect
 import sys
+import scipy.special as sp
 
 def is_number(s):
     try:
@@ -375,10 +376,185 @@ def ranks_from_quals():
     rfile.close()
     print('Successfully generated Ranks from Qual results for ',eventInput)
 
-def get_event_points():
-    pass
+def get_lb_obj(leaderboard_list,code):
+    code = code.strip()
+    if len(code) == 4 or code[:2].__eq__('MN') or code[:4].__eq__('TUIS'):  # regional or MNDUx or TUISx
+        return leaderboard_list[0]
+    elif code[:2].__eq__('MD') or code[:2].__eq__('VA') or code[:2].__eq__('CH'):
+        return leaderboard_list[1]
+    elif code[:2].__eq__('MI'):
+        return leaderboard_list[2]
+    elif code[:2].__eq__('IN'):
+        return leaderboard_list[3]
+    elif code[:2].__eq__('TX'):
+        return leaderboard_list[4]
+    elif code[:2].__eq__('NJ') or code[:2].__eq__('PA'):
+        return leaderboard_list[5]
+    elif code[:2].__eq__('NC'):
+        return leaderboard_list[6]
+    elif code[:2].__eq__('SC'):
+        return leaderboard_list[7]
+    elif code[:2].__eq__('IS'):
+        return leaderboard_list[8]
+    elif (code[:2].__eq__('ME') or code[:2].__eq__('NH') or code[:2].__eq__('CT') or code[:2].__eq__('MA') or
+          code[:2].__eq__('RI') or code[:2].__eq__('NE')):
+        return leaderboard_list[9]
+    elif code[:2].__eq__('ON'):
+        return leaderboard_list[10]
+    elif code[:2].__eq__('GA'):
+        return leaderboard_list[11]
+    elif code[:2].__eq__('WA') or code[:2].__eq__('OR') or code[:2].__eq__('PN'):
+        return leaderboard_list[12]
+    else:
+        print(code + 'is not a valid event code.\n')
+        return None
 
-def get_team_info():
+def internal_fto(team_list,teamNum):
+    for team in team_list:
+        if int(team.iTeamNum) == int(str(teamNum).strip()):
+            # print('Found team ', str(teamNum).strip())
+            return team
+
+def internal_fle(leaderboard,teamNum):
+    for leaderboard_entry in leaderboard.leaderboard:
+        if int(leaderboard_entry.teamNum) == int(teamNum):
+            return leaderboard_entry
+
+def sort_event_points(points_from_event):
+    event_points = points_from_event.copy()
+    for i in range(len(event_points) - 1):
+        max_ind = i
+        for j in range(i + 1, len(event_points)):
+            if int(event_points[j][1]) > int(event_points[max_ind][1]):
+                max_ind = j
+        event_points[i], event_points[max_ind] = event_points[max_ind], event_points[i]
+    return event_points
+
+def get_event_points(leaderboard_list,eventInput,team_list):
+    rankRows = []
+    alliRows = []
+    elimRows = []
+    rFileName = 'Official_Results/' + eventInput + 'Ranks.csv'
+    aFileName = 'Official_Results/' + eventInput + 'Alliances.csv'
+    eFileName = 'Official_Results/' + eventInput + 'Elims.csv'
+    points_from_event = []
+    with open(rFileName) as ranksFile:
+        reader1 = csv.reader(ranksFile)
+        for row in reader1:
+            rankRows.append(row)
+    ranksFile.close()
+    rankRows = rankRows[1:] # drop first row
+    with open(aFileName) as alliFile:
+        reader2 = csv.reader(alliFile)
+        for row in reader2:
+            alliRows.append(row)
+    alliFile.close()
+    alliRows = alliRows[1:] # drop first row
+    with open(eFileName) as elimFile:
+        reader3 = csv.reader(elimFile)
+        for row in reader3:
+            elimRows.append(row)
+    elimFile.close()
+    elimRows = elimRows[1:] # drop first row
+    teams_at_event = []      # team objects
+    for row in rankRows:
+        teamNum = int(row[1].strip())
+        teamO = internal_fto(team_list,teamNum)
+        teams_at_event.append(teamO)
+    teams_at_event.sort(key=lambda x: x.iTeamNum)
+    lbO = get_lb_obj(leaderboard_list,eventInput)
+    numTeams = len(teams_at_event)
+    alpha = 1.07  # constant
+    alpha_inv = 1.0 / alpha  # 1/alpha
+    #print(rankRows)
+    for team in teams_at_event:
+        rank = 0
+        count = 0
+        qp = 0
+        for rankRow in rankRows:
+            count += 1
+            if int(str(rankRow[1].strip())) == int(team.iTeamNum):
+                rank = count
+                break
+        numerator = float(numTeams - 2 * rank + 2.0)
+        denominator = float(alpha * numTeams)
+        firstTerm = sp.erfinv(numerator / denominator)
+        secondTerm = 10.0 / sp.erfinv(alpha_inv)
+        qp = max(round(firstTerm * secondTerm + 12), 4)
+        ap = 0
+        ref_teamNum = 0
+        for i in range(len(alliRows)):
+            allianceRow = alliRows[i]
+            pos = 0
+            for teamString in allianceRow:
+                pos += 1
+                if int(teamString.strip()) == int(team.iTeamNum):
+                    if pos < 3:
+                        ap = 16 - i
+                    else:
+                        ap = 1 + i
+                    ref_teamNum = int(allianceRow[0].strip())
+                else:
+                    continue
+        ep = 0
+        win_result = elimRows[len(elimRows)-1][9].strip()
+        win_ref = int(elimRows[13][1].strip()) if win_result.__eq__('RED') else int(elimRows[13][4].strip())
+        fin_ref = int(elimRows[13][4].strip()) if win_result.__eq__('RED') else int(elimRows[13][1].strip())
+        third_res = elimRows[12][9].strip()
+        third_ref = int(elimRows[12][4].strip()) if third_res.__eq__('RED') else int(elimRows[12][1].strip())
+        four_res = elimRows[11][9].strip()
+        four_ref = int(elimRows[11][4].strip()) if four_res.__eq__('RED') else int(elimRows[11][1].strip())
+        if int(ref_teamNum) == int(win_ref):
+            ep = 30
+        elif int(ref_teamNum) == int(fin_ref):
+            ep = 20
+        elif int(ref_teamNum) == int(third_ref):
+            ep = 13
+        elif int(ref_teamNum) == int(four_ref):
+            ep = 7
+        event_points = int(qp + ap + ep)
+        myEntry = internal_fle(lbO,team.iTeamNum)
+        myEntry.eventScores.append(event_points)
+        row_entry = [int(team.iTeamNum),event_points,int(qp),int(ap),int(ep)]
+        points_from_event.append(row_entry)
+        # end of for loop
+    lbO.update()
+    pFileName = 'Official_Results/' + eventInput + 'Points.csv'
+    with open(pFileName,'w',newline='') as pfile:
+        writer = csv.writer(pfile)
+        row1 = ['Team#','Total','Rank','Selection','Elims']
+        writer.writerow(row1)
+        writer.writerows(points_from_event)
+    pfile.close()
+    print('Successfully calculated and saved points for',eventInput)
+    print('Successfully updated ',lbO.sIdentifier,' leaderboard.')
+    if lbO.sIdentifier.__eq__('Regional'):
+        entries = []
+        points_from_event = sort_event_points(points_from_event)
+        entries.append(internal_fle(lbO,int(points_from_event[0][0]))) # top scorer
+        entries.append(internal_fle(lbO,int(points_from_event[1][0]))) # second
+        entries.append(internal_fle(lbO,int(points_from_event[2][0]))) # third
+        qualified = []
+        already_qed = []
+        for entry in entries:
+            if entry.champQ == 0:
+                entry.champQ == 1
+                qualified.append(entry.teamNum)
+            else:
+                already_qed.append(entry.teamNum)
+        for teamNum in qualified:
+            print(teamNum,' qualified for Champs!')
+        for teamNum in already_qed:
+            print(teamNum,' finished in the top 3, but they were already qualified!')
+    # end of method
+
+def get_team_info(team_list,teamNum):
+    teamO = internal_fto(team_list,teamNum)
+    print('Team Number: ',teamO.iTeamNum)
+    print('Team District: ',teamO.sDistrict)
+    print('Blue Banners: ',teamO.blueBanners)
+    print('Silver Medals: ',teamO.silverMedals)
+    print('Bronze Buttons: ',teamO.bronzeButtons)
     pass
 
 def run_cmp_quali(type):
@@ -750,9 +926,18 @@ while True:
         if debugChoice == 'r': # ranks
             ranks_from_quals()
         elif debugChoice == 'p': # points
-            get_event_points()
+            eventChoice = input('Enter Event Code: ').strip()
+            if eventChoice is None:
+                print('Please enter an event code.')
+                continue
+            get_event_points(leaderboard_list,eventChoice,team_list)
         elif debugChoice == 't': # team info
-            get_team_info()
+            teamString = input('Enter team number: ').strip()
+            if teamString is None:
+                print('Please enter a team number.')
+                continue
+            teamNum = int(teamString)
+            get_team_info(team_list,teamNum)
         elif debugChoice == 'q': # run dcmp/cmp quali
             run_cmp_quali(1) # hard-code to CMP for now (dcmps auto-run cmp quali so this is only for regional pools)
         else:
