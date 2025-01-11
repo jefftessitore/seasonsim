@@ -3,6 +3,7 @@ from Event import Event
 from District import District
 from EventRunner import EventRunner
 from LeaderboardEntry import LeaderboardEntry
+from RankEntry import RankEntry
 from enum import Enum
 import csv
 import random
@@ -150,6 +151,13 @@ def menu():
     print('f - Save event to csv')
     print('b - Batch save (WARNING! Uses a lot of file storage)')
     print('x - Exit the program')
+    print('z - Debug Menu')
+
+def debug_menu():
+    print('r - Calculate ranks based on Quals csv')
+    print('p - Calculate event points')
+    print('t - Print team info')
+    print('q - Run DCMP/CMP qualification')
 
 def save_everything():
     with open('allteams.csv','w',newline='') as teamSave:
@@ -249,6 +257,136 @@ def str_to_bool(s):
          return False
     else:
          raise ValueError
+
+def internal_fre(ranks,team):
+    for rank in ranks:
+        if int(str(rank.teamNum).strip()) == int(str(team).strip()):
+            return rank
+
+def ranks_from_quals():
+    eventInput = input('Event code to parse: ')
+    eventInput = eventInput.strip()
+    if eventInput is None:
+        print('Please input an event code.')
+        pass
+    qfileName = 'Official_Results/' + eventInput + 'Quals.csv'
+    qrows = []
+    with open(qfileName) as qFile:
+        reader = csv.reader(qFile)
+        for row in reader:
+            qrows.append(row)
+    qFile.close()
+    qrows = qrows[1:] # drop first row
+    teams = []
+    ranks = []
+    for qrow in qrows: # first pass to get list of teams and preload ranks
+        for i in range(1,7):
+            if int(qrow[i].strip()) not in teams:
+                teams.append(int(qrow[i].strip()))
+            else:
+                continue
+    for team in teams:
+        thisEntry = RankEntry(team)
+        ranks.append(thisEntry)
+    # INDICES:
+    # 7: Red Score/RP pips (•)
+    # 8: Blue Score/RP pips (•)
+    # 9: Result as string
+    # 10: Red Nav
+    # 11: Red Raise
+    # 12: Red Deck
+    # 13: Red Hull
+    # 14: Red Nest
+    # 15: Red Hoist
+    # 16: Blue Nav
+    # 17: Blue Raise
+    # 18: Blue Deck
+    # 19: Blue Hull
+    # 20: Blue Nest
+    # 21: Blue Hoist
+    for qrow in qrows: # second pass to actually get ranks
+        # print(qrow)
+        redScoreString = qrow[7].strip()
+        blueScoreString = qrow[8].strip()
+        win_result = qrow[9].strip()
+        redNav = int(qrow[10].strip())
+        redRaise = float(qrow[11].strip())
+        redDeck = int(qrow[12].strip())
+        redHull = int(qrow[13].strip())
+        redNest = int(qrow[14].strip())
+        redHoist = int(qrow[15].strip())
+        blueNav = int(qrow[16].strip())
+        blueRaise = float(qrow[17].strip())
+        blueDeck = int(qrow[18].strip())
+        blueHull = int(qrow[19].strip())
+        blueNest = int(qrow[20].strip())
+        blueHoist = int(qrow[21].strip())
+        redTeams = []
+        blueTeams = []
+        for i in range(1,4):
+            redTeams.append(int(qrow[i].strip()))
+            blueTeams.append(int(qrow[i+3].strip()))
+        redBonusRP = redScoreString.count('•')
+        blueBonusRP = blueScoreString.count('•')
+        if redBonusRP > 0:  # if bullet character present in string
+            red_totalScore = int(redScoreString[:redScoreString.find('•')])
+        else:
+            red_totalScore = int(redScoreString)
+        if blueBonusRP > 0:
+            blue_totalScore = int(blueScoreString[:blueScoreString.find('•')])
+        else:
+            blue_totalScore = int(blueScoreString)
+        redwin = 0
+        redloss = 0
+        redtie = 0
+        bluewin = 0
+        blueloss = 0
+        bluetie = 0
+        if win_result.__eq__('TIE'):
+            (redtie, bluetie) = (1, 1)
+            red_totalRP = 1 + redBonusRP
+            blue_totalRP = 1 + blueBonusRP
+        elif win_result.__eq__('RED'):
+            (redwin, blueloss) = (1, 1)
+            red_totalRP = 2 + redBonusRP
+            blue_totalRP = blueBonusRP
+        else:  # result.__eq__('BLUE')
+            (redloss, bluewin) = (1, 1)
+            red_totalRP = redBonusRP
+            blue_totalRP = 2 + blueBonusRP
+        for redTeam,blueTeam in zip(redTeams,blueTeams):
+            redRankEntry = internal_fre(ranks,redTeam)
+            blueRankEntry = internal_fre(ranks,blueTeam)
+            redRankEntry.update_entry(redwin,redloss,redtie,red_totalRP,red_totalScore,redNav,redRaise,redDeck,redHull,redNest,redHoist)
+            blueRankEntry.update_entry(bluewin,blueloss,bluetie,blue_totalRP,blue_totalScore,blueNav,blueRaise,blueDeck,blueHull,blueNest,blueHoist)
+    ranks.sort(key=lambda x: (-x.RS, -x.Nav, -x.Anch, -x.Deck, -x.Hull, -x.Nest, -x.Sail))
+    rFileName = 'Official_Results/' + eventInput + 'Ranks.csv'
+    with open(rFileName, 'w', newline='') as rfile:
+        writer = csv.writer(rfile)
+        rankNum = 1
+        row1 = ['Rank', 'Team#', 'W', 'L', 'T', '#P', 'RP', 'Rank Score', 'Total Score', 'Nav', 'Anch', 'Deck', 'Hull',
+                'Nest', 'Sail']
+        writer.writerow(row1)
+        for rank in ranks:
+            row = [rankNum, rank.teamNum, rank.wins, rank.losses, rank.ties, rank.totalMatches, rank.RP, rank.RS,
+                   rank.totalScore, rank.Nav, rank.Anch, rank.Deck, rank.Hull, rank.Nest, rank.Sail]
+            rankNum += 1
+            writer.writerow(row)
+    rfile.close()
+    print('Successfully generated Ranks from Qual results for ',eventInput)
+
+def get_event_points():
+    pass
+
+def get_team_info():
+    pass
+
+def run_cmp_quali(type):
+    if type == 0:
+        pass
+    else:
+        # regional quali
+        pass
 
 # Main Program
 preloaded = 0
@@ -567,6 +705,7 @@ while True:
     menu()
     cChoice = input('Enter choice --> ').strip()
     if cChoice is None:
+        print('No entry detected. Please try again.')
         continue
     else:
         cChoice = cChoice[0]
@@ -601,6 +740,24 @@ while True:
         save_everything()
     elif cChoice == 'x': # Exit program
         sys.exit('User exit program.')
+    elif cChoice == 'z': # Debug Menu
+        debug_menu()
+        debugChoice = input('Enter debug option--> ').strip()
+        if debugChoice is None:
+            continue
+        else:
+            debugChoice = debugChoice[0]
+        if debugChoice == 'r': # ranks
+            ranks_from_quals()
+        elif debugChoice == 'p': # points
+            get_event_points()
+        elif debugChoice == 't': # team info
+            get_team_info()
+        elif debugChoice == 'q': # run dcmp/cmp quali
+            run_cmp_quali(1) # hard-code to CMP for now (dcmps auto-run cmp quali so this is only for regional pools)
+        else:
+            print('Please enter valid debug choice.')
+            continue
     else:
         print('Invalid choice, please try again.')
 # end of program
