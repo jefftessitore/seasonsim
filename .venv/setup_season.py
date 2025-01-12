@@ -115,12 +115,14 @@ def display_leaderboards():
         i += 1
     chosenLB = int(input('Enter choice --> ').strip())%13 # takes input and moduluses(?) it with # available to prevent trolling
     print(leaderboard_list[chosenLB].sIdentifier)
-    for team in leaderboard_list[chosenLB].teams:
-        print(team)
-    for event in leaderboard_list[chosenLB].events:
-        print(event.sCode)
-    #for entry in leaderboard_list[chosenLB].leaderboard:
-    #    print(entry.teamNum)
+    #for team in leaderboard_list[chosenLB].teams:
+    #    print(team)
+    #for event in leaderboard_list[chosenLB].events:
+     #   print(event.sCode)
+    sort_leaderboard(leaderboard_list[chosenLB])
+    print('Team# | CMPQ | DCMPQ | Total Score')
+    for entry in leaderboard_list[chosenLB].leaderboard:
+        print('{:5d} | {:4d} | {:4d} | {:d}'.format(entry.teamNum,entry.champQ,entry.dcmpQ,entry.total))
 
 def sort_leaderboard(leaderboard):
     n = len(leaderboard.leaderboard)
@@ -832,19 +834,21 @@ else:
         while (len(str(lbRow[i])) == 4 or len(str(lbRow[i])) == 5) and int(lbRow[i] != -99999):
             eventCodes.append(str(lbRow[i]))
             i += 1
-        i += 2 # skip next -99999
+        i += 1 # skip next -99999
         rowIsRegional = int(lbRow[-1])
-        i += 1
         if i == len(lbRow):
             leaderboard.leaderboard = None
             continue
         entries = []
         while i < len(lbRow) and int(lbRow[i]) != -99999: # we padded with +99999 and -99998 so we should be fine here
             teamNum = int(lbRow[i]) # expecting teamNum of first entry here
+            #print(teamNum,' read from file.')
             thisEntry = LeaderboardEntry(teamNum,rowIsRegional)
+            i += 1
             while int(lbRow[i]) != 99999: #+99999
                 thisEntry.eventScores.append(int(lbRow[i]))
                 i += 1
+            i += 1 # skip the +99999 when we get to it
             thisEntry.dcmp = int(lbRow[i])
             i += 1
             thisEntry.dcmpQ = int(lbRow[i])
@@ -854,7 +858,7 @@ else:
             thisEntry.total = int(lbRow[i])
             i += 1 # should be on the -99998 now, check
             if int(lbRow[i]) != -99998:
-                print('Unexpected shift on entry %5d',teamNum)
+                print('Unexpected shift on entry',teamNum)
             entries.append(thisEntry)
             i += 1 # repeat while loop
         leaderboard.teams = teams.copy()
