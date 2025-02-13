@@ -2,6 +2,7 @@ from Team import Team
 from Event import Event
 from District import District
 from RankEntry import RankEntry
+from LeaderboardEntry import LeaderboardEntry
 import csv
 import sys
 import copy
@@ -26,6 +27,7 @@ class EventRunner:
     def __init__(self,eventCode,external_leaderboard_list,external_event_list,external_team_list,loaded_from_save):
         self.event_code = str(eventCode).strip()
         self.leaderboard_list = []
+        self.leaderboard_object = None
         self.event_list = []
         self.team_list = [] # ALL teams
         self.teams_at_event = []
@@ -59,6 +61,44 @@ class EventRunner:
             self.qualsRan = len(self.results_list_quals)
         #print(self.MECAC)
 
+    def get_event_lb(self):
+        code = self.event_code
+        if len(code) == 4 or code[:2].__eq__('MN') or code[:4].__eq__('TUIS'):  # regional or MNDUx or TUISx
+            return self.leaderboard_list[0]
+        elif code[:2].__eq__('MD') or code[:2].__eq__('VA') or code[:2].__eq__('CH'):
+            return self.leaderboard_list[1]
+        elif code[:2].__eq__('MI'):
+            return self.leaderboard_list[2]
+        elif code[:2].__eq__('IN'):
+            return self.leaderboard_list[3]
+        elif code[:2].__eq__('TX'):
+            return self.leaderboard_list[4]
+        elif code[:2].__eq__('NJ') or code[:2].__eq__('PA'):
+            return self.leaderboard_list[5]
+        elif code[:2].__eq__('NC'):
+            return self.leaderboard_list[6]
+        elif code[:2].__eq__('SC'):
+            return self.leaderboard_list[7]
+        elif code[:2].__eq__('IS'):
+            return self.leaderboard_list[8]
+        elif (code[:2].__eq__('ME') or code[:2].__eq__('NH') or code[:2].__eq__('CT') or code[:2].__eq__('MA') or
+              code[:2].__eq__('RI') or code[:2].__eq__('NE')):
+            return self.leaderboard_list[9]
+        elif code[:2].__eq__('ON'):
+            return self.leaderboard_list[10]
+        elif code[:2].__eq__('GA'):
+            return self.leaderboard_list[11]
+        elif code[:2].__eq__('WA') or code[:2].__eq__('OR') or code[:2].__eq__('PN'):
+            return self.leaderboard_list[12]
+        else:
+            print(code + 'is not a valid event code.\n')
+            return None
+
+    def event_get_lbe(self,teamNum):
+        for leaderboard_entry in self.leaderboard_object:
+            if int(leaderboard_entry.teamNum) == int(teamNum):
+                return leaderboard_entry
+
     """
     :param self
     :returns: None
@@ -70,6 +110,7 @@ class EventRunner:
             self.event_list.append(event)
         for team in external_team_list:
             self.team_list.append(team)
+        self.leaderboard_object = get_event_lb()
 
     """
     :param self
@@ -923,6 +964,11 @@ class EventRunner:
                     lbEntry.eventScores.append(event_points)
             points_entry = [int(team.iTeamNum),event_points,int(qp),int(ap),int(ep)]
             self.points_from_event.append(points_entry)
+            thisLbEntry = self.event_get_lbe(team.iTeamNum)
+            if thisLbEntry is None:
+                print(teamNum, 'is not eligible for points in this region.')
+                continue
+            thisLbEntry.eventScores.append(event_points)
         # end of outer for loop
         self.event_complete = 1
     # end of method
@@ -932,9 +978,9 @@ class EventRunner:
     :returns: None
     """
     def show_event_points(self):
-        print('Team# | Points')
+        print('Team# | Total | Rank | Selection | Elims')
         for entry in self.points_from_event:
-            print('{:5d} | {:6d}'.format(entry[0],entry[1]))
+            print('{:5d} | {:6d} | {:4d} | {:9d} | {:5d}'.format(entry[0],entry[1],entry[2],entry[3],entry[4]))
 
     """
     :param self
@@ -1296,6 +1342,7 @@ class EventRunner:
         eFileName = 'Official_Results/' + str(self.event_code) + 'Elims.csv'
         rFileName = 'Official_Results/' + str(self.event_code) + 'Ranks.csv'
         dFileName = 'Official_Results/' + str(self.event_code) + 'Declines.csv'
+        pFileName = 'Official_Results/' + str(self.event_code) + 'Points.csv'
         with open(qFileName,'w',newline='') as qfile:
             writer = csv.writer(qfile)
             row1 = ['#','Red_1','Red_2','Red_3','Blue1','Blue2','Blue3','Red_Score','BlueScore','Result',
@@ -1327,7 +1374,6 @@ class EventRunner:
                 rankNum += 1
                 writer.writerow(row)
         rfile.close()
-
         with open(dFileName,'w',newline='') as dfile:
             writer = csv.writer(dfile)
             if len(self.declined_teams) > 0:
@@ -1340,5 +1386,9 @@ class EventRunner:
                 row1 = ['No','Declines']
                 writer.writerow(row1)
         dfile.close()
-
+        with open(pFileName,'w',newline='') as pfile:
+            writer = csv.writer(pfile)
+            row1 = ['Team#', 'Total', 'Rank', 'Selection', 'Elims']
+            writer.writerow(row1)
+            writer.writerows(self.points_from_event)
     # end of program

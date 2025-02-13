@@ -220,10 +220,14 @@ def save_everything():
                 #print(team)
                 row.append(team)
             row.append(int(-99999)) # pad with -99999
-            for eventO in leaderboard.events:
+            for event in leaderboard.events:
                 #print(eventO.sCode)
-                row.append(eventO.sCode)
+                if isinstance(event,str):
+                    row.append(event)
+                else:
+                    row.append(event.sCode)
             row.append(int(-99999))
+            ''' Temporarily disabling to move on
             for entry in leaderboard.leaderboard:
                 #print(entry.teamNum)
                 row.append(entry.teamNum)
@@ -240,6 +244,7 @@ def save_everything():
                 #print(entry.total)
                 row.append(entry.total)
                 row.append(-99998) # need to pad each entry
+            '''
             row.append(-99999) # look for last -99999
             #print(leaderboard.isRegional)
             row.append(leaderboard.isRegional)
@@ -516,6 +521,9 @@ def get_event_points(leaderboard_list,eventInput,team_list):
             ep = 7
         event_points = int(qp + ap + ep)
         myEntry = internal_fle(lbO,team.iTeamNum)
+        if myEntry is None:
+            print(team.iTeamNum,' is not eligible for points in this region.')
+            continue
         myEntry.eventScores.append(event_points)
         row_entry = [int(team.iTeamNum),event_points,int(qp),int(ap),int(ep)]
         points_from_event.append(row_entry)

@@ -26,7 +26,7 @@ class District:
     """
     def update(self):
         for entry in self.leaderboard:
-            entry.total += entry.dcmp
+            entry.total = entry.dcmp # hard reset on update
             if len(entry.eventScores) >= 2:
                 for i in range(2):
                     entry.total += entry.eventScores[i]
