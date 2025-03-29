@@ -59,11 +59,13 @@ class EventRunner:
         if self.loaded:
             self.load_partial_event()
             self.qualsRan = len(self.results_list_quals)
+        self.stringFlag = 0
         #print(self.MECAC)
 
     def get_event_lb(self):
         code = self.event_code
         if len(code) == 4 or code[:2].__eq__('MN') or code[:4].__eq__('TUIS'):  # regional or MNDUx or TUISx
+            self.stringFlag = 1
             return self.leaderboard_list[0]
         elif code[:2].__eq__('MD') or code[:2].__eq__('VA') or code[:2].__eq__('CH'):
             return self.leaderboard_list[1]
@@ -95,7 +97,7 @@ class EventRunner:
             return None
 
     def event_get_lbe(self,teamNum):
-        for leaderboard_entry in self.leaderboard_object:
+        for leaderboard_entry in self.leaderboard_object.leaderboard:
             if int(leaderboard_entry.teamNum) == int(teamNum):
                 return leaderboard_entry
 
@@ -110,7 +112,7 @@ class EventRunner:
             self.event_list.append(event)
         for team in external_team_list:
             self.team_list.append(team)
-        self.leaderboard_object = get_event_lb()
+        self.leaderboard_object = self.get_event_lb()
 
     """
     :param self
@@ -539,9 +541,19 @@ class EventRunner:
         for event in self.event_list:
             #print(str(event_code).strip())
             #print(event.sCode.strip())
-            if str(event_code.sCode).strip().__eq__(event.sCode.strip()):
+            if isinstance(event_code, str):
+                testWith = str(event_code).strip()
+            else:
+                testWith = event_code.sCode.strip()
+            if isinstance(event, str):
+                testAgainst = str(event).strip()
+            else:
+                testAgainst = event.sCode.strip()
+            if testWith.__eq__(testAgainst):
                 #print('My event code is ',str(event_code).strip(),' and I matched ',event.sCode.strip())
                 self.eventObject = copy.deepcopy(event)
+                if self.stringFlag != 0:
+                    return 1 # return non-zero value
                 return event.iWeek
         return 0
 
@@ -557,9 +569,13 @@ class EventRunner:
             #print(leaderboard.sIdentifier)
             for event in leaderboard.events:
                 #print(event.sCode)
-                if eventCode.__eq__(event.sCode):
+                if isinstance(event, str):
+                    testAgainst = str(event)
+                else:
+                    testAgainst = event.sCode
+                if eventCode.__eq__(testAgainst):
                     self.week = self.get_event_week(event)
-                    if self.week == 0:
+                    if self.week == 0 and self.stringFlag == 0:
                         return 'ERR', None
                     return leaderboard.sIdentifier, leaderboard
         return 'ERR', None
@@ -896,6 +912,8 @@ class EventRunner:
     :returns: None
     """
     def calc_event_points(self):
+        pass
+        '''
         self.event_info = [self.event_code,self.region,self.week]
         numTeams = len(self.teams_at_event)
         alpha = 1.07 # constant
@@ -972,15 +990,19 @@ class EventRunner:
         # end of outer for loop
         self.event_complete = 1
     # end of method
+    '''
 
     """
     :param self
     :returns: None
     """
     def show_event_points(self):
+        pass
+        '''
         print('Team# | Total | Rank | Selection | Elims')
         for entry in self.points_from_event:
             print('{:5d} | {:6d} | {:4d} | {:9d} | {:5d}'.format(entry[0],entry[1],entry[2],entry[3],entry[4]))
+        '''
 
     """
     :param self
@@ -1170,7 +1192,7 @@ class EventRunner:
                 continue
             matchNum += 1
             # end of while loop
-        self.calc_event_points()
+        ### self.calc_event_points()
         # end of method
 
     """
@@ -1342,7 +1364,7 @@ class EventRunner:
         eFileName = 'Official_Results/' + str(self.event_code) + 'Elims.csv'
         rFileName = 'Official_Results/' + str(self.event_code) + 'Ranks.csv'
         dFileName = 'Official_Results/' + str(self.event_code) + 'Declines.csv'
-        pFileName = 'Official_Results/' + str(self.event_code) + 'Points.csv'
+        ### pFileName = 'Official_Results/' + str(self.event_code) + 'Points.csv'
         with open(qFileName,'w',newline='') as qfile:
             writer = csv.writer(qfile)
             row1 = ['#','Red_1','Red_2','Red_3','Blue1','Blue2','Blue3','Red_Score','BlueScore','Result',
@@ -1386,9 +1408,11 @@ class EventRunner:
                 row1 = ['No','Declines']
                 writer.writerow(row1)
         dfile.close()
+        '''
         with open(pFileName,'w',newline='') as pfile:
             writer = csv.writer(pfile)
             row1 = ['Team#', 'Total', 'Rank', 'Selection', 'Elims']
             writer.writerow(row1)
             writer.writerows(self.points_from_event)
+        '''
     # end of program

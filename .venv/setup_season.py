@@ -108,6 +108,8 @@ def get_var_name(var): # Stolen from the internet
             return name
 
 def display_leaderboards():
+    print('This option has been disabled.')
+    '''
     i = 0
     print('Code - Leaderboard')
     for leaderboard in leaderboard_list:
@@ -123,6 +125,7 @@ def display_leaderboards():
     print('Team# | CMPQ | DCMPQ | Total Score')
     for entry in leaderboard_list[chosenLB].leaderboard:
         print('{:5d} | {:4d} | {:4d} | {:d}'.format(entry.teamNum,entry.champQ,entry.dcmpQ,entry.total))
+    '''
 
 def sort_leaderboard(leaderboard):
     n = len(leaderboard.leaderboard)
@@ -438,6 +441,7 @@ def sort_event_points(points_from_event):
     return event_points
 
 def get_event_points(leaderboard_list,eventInput,team_list):
+    '''
     rankRows = []
     alliRows = []
     elimRows = []
@@ -556,6 +560,7 @@ def get_event_points(leaderboard_list,eventInput,team_list):
             print(teamNum,' qualified for Champs!')
         for teamNum in already_qed:
             print(teamNum,' finished in the top 3, but they were already qualified!')
+    '''
     # end of method
 
 def get_team_info(team_list,teamNum):
@@ -915,7 +920,8 @@ while True:
         resultType = input('Enter q, a, or e for quals, alliance selection, and elims results, respectively: ')
         eventRunning.show_results(resultType)
     elif cChoice == 's': # Show points from event
-        eventRunning.show_event_points()
+        ### eventRunning.show_event_points()
+        print('This option has been disabled.')
     elif cChoice == 'i': # Save in-progress event
         eventCode = eventRunning.save_partial_event()
         in_progress_events.append(eventCode)
@@ -938,11 +944,14 @@ while True:
         if debugChoice == 'r': # ranks
             ranks_from_quals()
         elif debugChoice == 'p': # points
+            print('This option has been disabled.')
+            '''
             eventChoice = input('Enter Event Code: ').strip()
             if eventChoice is None:
                 print('Please enter an event code.')
                 continue
             get_event_points(leaderboard_list,eventChoice,team_list)
+            '''
         elif debugChoice == 't': # team info
             teamString = input('Enter team number: ').strip()
             if teamString is None:
